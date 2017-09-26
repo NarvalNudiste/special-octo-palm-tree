@@ -18,8 +18,8 @@ def main():
 	#EDA values range from 0.0 to 1.000
 	#HR values range from 50 to 70
 	
-	predict(clf, 0.16, 50)
-	
+	predict(clf, 0.60, 60)
+	predict(clf, 0.30, 40)
 
 
 class dataLoader():
@@ -28,20 +28,17 @@ class dataLoader():
 	def __init__(self, HR_path, STRESS_path, EDA_path):
 	#the __init__ magic function loads the different files and stores them to the X (values) and self.Y (target values) member arrays
 	
-		#opening various files, extracting csv data
-		with open(HR_path):
-			self.hr_data = np.genfromtxt(HR_path, delimiter=' ')
-		with open(STRESS_path):
-			self.stress_data = np.genfromtxt(STRESS_path, delimiter=' ')
-		with open(EDA_path):
-			self.eda_data = np.genfromtxt(EDA_path, delimiter=' ')
+		#Extracting csv data
+		self.hr_data = np.genfromtxt(HR_path, delimiter=' ')
+		self.stress_data = np.genfromtxt(STRESS_path, delimiter=' ')
+		self.eda_data = np.genfromtxt(EDA_path, delimiter=' ')
 		
 
 		#We declare a 2-dimensional array to store values
 		self.X = np.empty([len(self.stress_data), 2])
-		
-		for i in range(len(self.stress_data)):
-			self.X[i] = ([self.hr_data[i], self.eda_data[i]])
+		for i, (hr, eda) in enumerate(zip(self.hr_data, self.eda_data)):
+			self.X[i] = (hr, eda)
+		#Merci grand sachem
 		
 		#TODO : fix 1d scikit deprecation issue
 		self.Y = np.array(self.stress_data)
