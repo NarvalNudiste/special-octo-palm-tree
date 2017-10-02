@@ -21,7 +21,9 @@ import os
 import sys
 #sys.path.insert(0, os.path.abspath('.'))
 sys.path.append(os.path.join(os.path.dirname(__name__), '..'))
-sys.path.append("C:\\He-Arc-3\\P3\\special-octo-palm-tree\\")
+sys.path.append("C:\\dev\\python\\special-octo-palm-tree\\")
+sys.path.append("C:\\dev\\python\\special-octo-palm-tree\\dloader.py")
+sys.path.append("C:\\dev\\python\\special-octo-palm-tree\\clfmgr.py")
 
 # -- General configuration ------------------------------------------------
 

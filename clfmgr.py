@@ -1,6 +1,8 @@
 import pickle
 
 class clfmanager():
+	'''Class used to write svm classifiers to disk with pickle
+	'''
 	def writeClassifierToDisk(self, clf, path):
 		s = pickle.dumps(clf)
 		with open(path, "wb") as f:

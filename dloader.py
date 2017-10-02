@@ -2,7 +2,7 @@ import numpy as np
 from numpy import genfromtxt
 
 class dataloader():
-	'''Tiny class used to load different .cvs files and to build our vlues / target array
+	'''Class used to load different .cvs files and to build our vlues / target array
 	'''
 	def __init__(self, HR_path, STRESS_path, EDA_path):
 	#the __init__ magic function loads the different files and stores them to the X (values) and self.Y (target values) member arrays

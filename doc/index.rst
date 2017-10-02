@@ -25,3 +25,7 @@ Documentation
 
 .. automodule:: dloader
     :members:
+
+.. automodule:: clfmgr
+	:members:
+	
