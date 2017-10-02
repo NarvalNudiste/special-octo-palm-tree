@@ -1,8 +1,8 @@
 # data 
-test_data/
+data/
 html/
 old/
-dump.txt
+saves/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
