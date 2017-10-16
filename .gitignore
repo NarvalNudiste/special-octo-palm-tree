@@ -1,8 +1,13 @@
 # data 
-data/
-html/
-old/
-saves/
+SVM/data/
+SVM/html/
+SVM/old/
+SVM/saves/
+SVM/cnn/
+
+Keras/.ipnyb_checkpoints
+Keras/data/
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
