@@ -39,7 +39,7 @@ Therefore, our main focus will be on Keras.
 3. Getting data
   * Stress workshop planning
   * Actual data collection
-  * Data pre-processing / 
+  * Data pre-processing
   
 4. Keras implementation
   * Model creation
