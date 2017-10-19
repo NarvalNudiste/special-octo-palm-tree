@@ -1,5 +1,5 @@
-# Stress detect - Deep learning classification
-## He-Arc - Third project
+# Stress detection / Deep learning classification
+## he-arc - 3rd project
 ##### Guillaume Noguera, inf3-dlma
 
 ### Stress classification with various machine learning libraries
