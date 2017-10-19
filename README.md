@@ -16,7 +16,9 @@ The old model will obviously use the same dataset to get relevant performance co
 ### Tensorflow vs Keras
 
 Keras uses tensorflow - it can be seen a a higher level library using tf - and will shortly be integrated to it. 
-It can be used to quickly create complex models with very little code. Tensorflow can be seen more as a *language* than a framework, providing his own syntax to develop machine learning models. 
+It can be used to quickly create complex models with very little code. Tensorflow can be seen more as a *language* than a framework, providing his own syntax to develop machine learning models.
+On the other hand, Keras will compare to Scikit-learn, providing pre-defined models (while allowing the user to define his own). 
+A possible approach could be to use Keras pre-defined models before diving into Tensorflow (as time could - and will - be a possible limitation)  
 
 ### Requirements (will obviously subject to change) 
 
