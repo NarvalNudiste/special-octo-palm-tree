@@ -2,6 +2,12 @@ import tensorflow as tf
 import cv2
 import numpy as np
  
+hr_data = np.genfromtext('../SVM/data/HR.csv', delimiters = ' ')
+eda_data = np.genfromtext('../SVM/data/EDA.csv', delimiters = ' ')
+stress_data = np.genfromtext('../SVM/data/STRESS.csv', delimiters = ' ')
+
+trainStressX = 
+
 trainX = np.linspace(-1, 1, 101)
 trainY = 3 * trainX + np.random.randn(*trainX.shape) * 0.33
 
