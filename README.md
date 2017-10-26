@@ -66,4 +66,35 @@ The most basic MLP contains an input layer, an hidden layer and an output layer.
 
 ### Keras basics
 
-*todo*
+Keras provides us with easy ways to quickly build a model : 
+
+```python
+model = Sequential()
+```
+
+Layers can then be stacked on top of each other this way : 
+
+```python
+model.add(Dense(32, input_shape=(*, 16))) # input arrays of shape (*, 16) and output arrays of shape (*, 32)
+model.add(Dense(10, activation='softmax')) # activation function can be specified there
+#and so on
+```
+
+Next, the model needs to be compiled. The optimizer, loss function and metrics are provided there.
+
+```python
+model.compile(optimizer='rmsprop',
+              loss='categorical_crossentropy',
+              metrics=['accuracy'])
+```
+A lot of optimizers are available in Keras, such as stochastic gradient descent, RMSprop (often good for recurrent neural networks), ADAM .. the whole list is available in the [keras documentation.](https://keras.io/optimizers/) 
+
+After compilation, the model can be trained & evaluated: 
+
+```python
+model.fit(data, labels, epochs=10, batch_size=32) #epochs are the number of passes
+score = model.evaluate(x_test, y_test, batch_size=128)
+```
+
+
+
