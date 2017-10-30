@@ -1,0 +1,96 @@
+#with same training / test sets  / epochs : 150 / batchs : 10
+=================================================
+m.add(Dense(8, input_dim=8, activation = 'relu'))
+m.add(Dense(1, activation="sigmoid"))
+
+-> acc : 70.18%
+=================================================
+m.add(Dense(12, input_dim=8, activation = 'relu'))
+m.add(Dense(1, activation="sigmoid"))
+
+-> acc : 65.36%
+=================================================
+m.add(Dense(1, input_dim=8, activation = 'relu'))
+m.add(Dense(1, activation="sigmoid"))
+
+-> acc : 65.10%
+=================================================
+m.add(Dense(8, input_dim=8, activation = 'relu'))
+m.add(Dense(8, activation = 'relu'))
+m.add(Dense(1, activation="sigmoid"))
+
+-> acc : 75.00%
+=================================================
+m.add(Dense(16, input_dim=8, activation = 'relu'))
+m.add(Dropout(16))
+m.add(Dense(16, activation = 'relu'))
+m.add(Dense(1, activation="sigmoid"))
+
+-> acc : 75.13%
+=================================================
+-----------------------------------------------
+
+switched to batch_size = 128 -> way faster
+=================================================
+m.add(Dense(16, input_dim=8, activation = 'relu'))
+m.add(Dropout(16))
+m.add(Dense(16, activation = 'relu'))
+m.add(Dense(1, activation="sigmoid"))
+
+-> acc : 76.17%
+=================================================
+m.add(Dense(16, input_dim=8, activation = 'relu'))
+m.add(Dropout(16))
+for i in range(8):
+  m.add(Dense(16, activation = 'relu'))
+m.add(Dense(1, activation="sigmoid"))
+
+-> acc : 85.68% #best so far
+=================================================
+m.add(Dense(16, input_dim=8, activation = 'relu'))
+m.add(Dropout(16))
+for i in range(16):
+  m.add(Dense(16, activation = 'relu'))
+m.add(Dense(1, activation="sigmoid"))
+
+-> acc : 82.94%
+=================================================
+#relu seems the best activation fonction so far, tried with sigmoids in dense layers but we loose performances
+
+
+m.add(Dense(8, input_dim=8, activation = 'relu'))
+m.add(Dropout(8))
+for i in range(8):
+  m.add(Dense(8, activation = 'relu'))
+m.add(Dropout(8))
+m.add(Dense(1, activation="sigmoid"))
+
+-> acc : 79.69%
+=================================================
+
+
+
+
+
+###### 300 epochs
+m.add(Dense(16, input_dim=8, activation = 'relu'))
+m.add(Dropout(16))
+for i in range(8):
+  m.add(Dense(16, activation = 'relu'))
+m.add(Dense(1, activation="sigmoid"))
+
+-> acc : 92.06% but maybe biased
+
+
+##### 1000 epochs : 96.48% acc
+
+m = Sequential()
+m.add(Dense(16, input_dim=8, activation = 'relu'))
+m.add(Dropout(16))
+for i in range(8):
+  m.add(Dense(16, activation = 'relu'))
+  m.add(Dropout(16))
+m.add(Dense(1, activation="sigmoid"))
+m.summary()
+
+##### 10'000 epochs : 99.74%
