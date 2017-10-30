@@ -7,7 +7,7 @@ SVM/cnn/
 
 Keras/.ipnyb_checkpoints
 Keras/data/
-
+Keras/logs/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
