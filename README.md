@@ -96,5 +96,6 @@ model.fit(data, labels, epochs=10, batch_size=32) #epochs are the number of pass
 score = model.evaluate(x_test, y_test, batch_size=128)
 ```
 
+### Performances Comparison
 
-
+[Here's some performances comparison](docs/PERFS.md)
