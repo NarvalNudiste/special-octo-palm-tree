@@ -57,7 +57,7 @@ m.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 input("- Model compiled, press enter to train ")
 #m.fit(X, Y, epochs=500, batch_size=128, callbacks = callbacks)
-m.fit(X_train, Y_train, epochs=500, batch_size=128, verbose=1)
+m.fit(X_train, Y_train, epochs=100, batch_size=128, verbose=1)
 
 
 #for i in range(k):

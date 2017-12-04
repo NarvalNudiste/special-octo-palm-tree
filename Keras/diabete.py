@@ -21,6 +21,7 @@ splits = 10
 kfold = StratifiedKFold(n_splits=splits, shuffle=True, random_state=seed)
 cvscores = []
 
+print(Y.shape)
 for train, test in kfold.split(X, Y):
     optimizers = {'adam'}
     for o in optimizers:
@@ -29,8 +30,8 @@ for train, test in kfold.split(X, Y):
         m.add(Dense(32, activation="relu"))
         m.add(Dense(1, activation="sigmoid"))
         m.compile(loss='binary_crossentropy', optimizer=o, metrics=['accuracy'])
-        m.fit(X[train], Y[train], epochs=1000, batch_size=128, verbose=0)
-        scores = m.evaluate(X[test], Y[test], verbose=0)
-        print("%s: %.2f%%" % (m.metrics_names[1], scores[1]*100))
-        cvscores.append(scores[1] * 100)
-print("%.2f%% (+/- %.2f%%)" % (numpy.mean(cvscores), numpy.std(cvscores)))
+        #m.fit(X[train], Y[train], epochs=1000, batch_size=128, verbose=0)
+        #scores = m.evaluate(X[test], Y[test], verbose=0)
+        #print("%s: %.2f%%" % (m.metrics_names[1], scores[1]*100))
+        #cvscores.append(scores[1] * 100)
+#print("%.2f%% (+/- %.2f%%)" % (numpy.mean(cvscores), numpy.std(cvscores)))
