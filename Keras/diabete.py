@@ -2,6 +2,8 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout
 from keras.callbacks import TensorBoard
 
+from keras import backend as K
+
 from sklearn.model_selection import StratifiedKFold
 
 import numpy
@@ -21,7 +23,6 @@ splits = 10
 kfold = StratifiedKFold(n_splits=splits, shuffle=True, random_state=seed)
 cvscores = []
 
-print(Y.shape)
 for train, test in kfold.split(X, Y):
     optimizers = {'adam'}
     for o in optimizers:
