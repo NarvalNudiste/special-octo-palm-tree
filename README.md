@@ -99,3 +99,69 @@ score = model.evaluate(x_test, y_test, batch_size=128)
 ### Performances Comparison
 
 [Here's some performances comparison](docs/PERFS.md)
+
+Thoses performances comparison comes from multiple training sessions on the pima diabetes dataset.
+Models have been tested with different hidden layers and neurons numbers (from 1x1 to 64x64), with or without Dropout layers, and each time for 5 different optimizers.
+Overall, the Rectifier activation function (ReLU) seems to be the best choice for binary classification on this dataset.
+As this may vary on differnt data structure, I think repeating those tests with the proper data can help finding a suitable model. 
+
+
+### Data collection / Workshop
+
+
+### Data pre-processing
+
+All E4 wristband sensors deliver different data formats, as the sample rate may vary : the photoplethysmograph sensor (BVP) has a 64Hz sample rate, whereas the electrodermal activity sensor sensor (EDA) only samples at 4Hz. 
+Thus, we need a function using linear interpolation to even out our arrays  : 
+
+```python
+def reshape_array_freq(bFreq, freq, ary):
+    if bFreq is freq:
+        return ary
+    else:
+        dF = int(freq/bFreq)
+        new = np.empty((ary.shape[0]-1) * int(dF))
+        for i in range(len(ary)-1):
+            delta = (ary[i+1] - ary[i])/dF
+            for c in range(int(dF)):
+                new[(i*dF)+c] = ary[i] + delta*c
+        return new
+```
+
+We also need to remove some data at the end of certain data arrays, as they do not have the same length after interpolation (I guess all the sensors don't necessarily stop at the exact same time)
+
+```python
+
+def resize_ary(a1, a2):
+    diff = abs(a1.shape[0] - a2.shape[0])
+    if a1.shape[0] < a2.shape[0]:
+        a2 = a2[:-diff]
+    else:
+        a1 = a1[:-diff]
+    return a1, a2
+``` 
+
+![Formatted data](Keras/pics/r_plot_all.png "Formatted data")
+
+
+Our data being properly formatted, we then use JSON to store labels from the data collection survey.
+
+```json
+{
+  "person" : {
+    "id" : 0,
+    "file" : "a",
+    "time_start" :,
+    "time_stop" :,
+    "overall_health" : 2,
+    "energetic" : 2,
+    "overall_stress" : 3,
+    "stressed_past_24h" : 3,
+    "sleep_quality_past_24h" : 2,
+    "sleep_quality_past_month" : 1
+  }
+}
+```
+
+Later on, those labels will hopefully help our classifier.
+

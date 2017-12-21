@@ -37,16 +37,17 @@ def resize_ary(a1, a2):
     return a1, a2
 
 ''' creates a new array with intermediates values (linear interpolation) to match target freq ary '''
-def reshape_array_freq(baseFreq, freq, ary):
-    if baseFreq == freq:
+def reshape_array_freq(bFreq, freq, ary):
+    if bFreq is freq:
         return ary
     else:
-        newArray = np.empty(ary.shape[0] * int(freq/baseFreq))
+        dF = int(freq/bFreq)
+        new = np.empty((ary.shape[0]-1) * int(dF))
         for i in range(len(ary)-1):
-            delta = ary[i] - ary[i+1]/freq
-            for c in range(int(freq)):
-                newArray[i+c] = ary[i] + delta*c
-        return newArray
+            delta = (ary[i+1] - ary[i])/dF
+            for c in range(int(dF)):
+                new[(i*dF)+c] = ary[i] + delta*c
+        return new
 
 '''maybe not needed'''
 def stripDowntime(array, timestamps):
@@ -87,50 +88,36 @@ data_ary.append(eda_b)
 data_ary.append(temp_b)
 data_ary.append(bvp_b)
 data_ary.append(hr_b)
-
-print("eda shape : ", eda_a.shape)
-
 #eda_b = np.delete(eda_b, np.s_[5000:8500], axis = 0)
 #temp_b = np.delete(temp_b, np.s_[5000:8500], axis = 0)
+#timestamps1 = [(0, 1500), (5310, 8150), (11425, 12493), (16170, 17360), (20800, 21813), (25316, -1)]
 
-timestamps1 = [(0, 1500), (5310, 8150), (11425, 12493), (16170, 17360), (20800, 21813), (25316, -1)]
+temp_freq = temp_a[1]
+hr_freq = hr_a[1]
+bvp_freq = bvp_a[1]
+eda_freq = eda_a[1]
 
-#b1 = batch(0, 1500, 4, 4, 1, id = 0)
-#b2 = batch(5310, 8150, 5, 4, 1, id = 1)
-#b3 = batch(11425, 12493, 4, 4, 3, id = 2)
-#b4 = batch(16170, 17360, 0, 0, 0, id = 3)
-#b5 = batch(20800, 21813, 0, 0, 0, id = 4)
-
-
-#eda_a = stripDowntime(eda_a, timestamps1)
-#temp_a = stripDowntime(temp_a, timestamps1)
-#eda_b = stripDowntime(eda_b, timestamps2)
-#temp_b = stripDowntime(temp_b, timestamps2)
-
-#resizing arrays
-#eda_a, temp_a = resize_ary(eda_a, temp_a)
-#eda_b, temp_b = resize_ary(eda_b, temp_b)
-
-#plotting
-#plt.plot(np.linspace(0,eda_a.shape[0], eda_a.shape[0]), eda_a)
-#plt.plot(np.linspace(0, temp_a.shape[0], temp_a.shape[0]), temp_a)
-print("EDA SHAPE BEFORE INTERP", eda_a.shape)
-eda_a = reshape_array_freq(eda_a[1],bvp_a[1],eda_a)
-print("EDA SHAPE AFTER INTERP", eda_a.shape)
-#plotting bvp
+#stripping useless infos
 bvp_a = bvp_a[2:]
 eda_a = eda_a[2:]
+hr_a = hr_a[2:]
+temp_a = temp_a[2:]
+#interpolating missing values
+eda_a = reshape_array_freq(eda_freq,bvp_freq,eda_a)
+hr_a = reshape_array_freq(hr_freq, bvp_freq, hr_a)
+temp_a = reshape_array_freq(temp_freq, bvp_freq, temp_a)
+
+
 bvp_a, eda_a = resize_ary(bvp_a, eda_a)
+bvp_a, hr_a = resize_ary(bvp_a, hr_a)
+bvp_a, temp_a = resize_ary(bvp_a, temp_a)
 
 plt.plot(np.linspace(0, eda_a.shape[0], eda_a.shape[0]), eda_a)
 plt.plot(np.linspace(0,bvp_a.shape[0], bvp_a.shape[0]), bvp_a)
+plt.plot(np.linspace(0,hr_a.shape[0], hr_a.shape[0]), hr_a)
+plt.plot(np.linspace(0,temp_a.shape[0], temp_a.shape[0]), temp_a)
 plt.show()
 
 data = np.array((eda_a, temp_a))
 data = data.T
-
-print(data[0])
-print(data.shape)
-
-labels = [[0, 0], [30, 1], [60, 0], [90, 1]]
-print(labelize(freq=4, labels=labels).shape)
+print(data)
