@@ -1,22 +1,25 @@
-from keras.models import Sequential
-from keras.layers import Dense, Dropout
-from keras.callbacks import TensorBoard
-from sklearn.model_selection import StratifiedKFold
+#from keras.models import Sequential
+#from keras.layers import Dense, Dropout
+#from keras.callbacks import TensorBoard
+#from sklearn.model_selection import StratifiedKFold
+import os
+import csv
 import numpy as np
 import matplotlib.pyplot as plt
 from labelizer import labelize
 import time
 import json
+from pprint import pprint
+
+MAX_FREQ = 64
+writing = False
 
 path_a = "data/URIT_1581_A01212B_2017_10_31_0946/"
 path_b = "data/URIT_1581-A01713-2017_10_31_0949/"
-#TODO égaliser les tableaux - done
-#TODO Faire une interpolation sur les fréq. d'échantillonnages différentes - done
-#TODO ptêtre partir depuis le 64hz en fait - done
-#Séprarer en activités aussi, plus tard
+#TODO Séprarer en activités aussi, plus tard
 
 class Person:
-    def __init__(self, start, stop, overall_health, energetic, overall_stress, stressed_past_24h, sleep_quality_past_24h,  sleep_quality_past_month, data, id):
+    def __init__(self, start, stop, overall_health, energetic, overall_stress, stressed_past_24h, sleep_quality_past_24h,  sleep_quality_past_month, id):
         self.timestamps = (start, stop)
         self.overall_health = overall_health
         self.energetic = energetic
@@ -24,8 +27,11 @@ class Person:
         self.stressed_past_24h = stressed_past_24h
         self.sleep_quality_past_24h = sleep_quality_past_24h
         self.sleep_quality_past_month = sleep_quality_past_month
-        self.data = data
         self.id = id
+        self.eda = None
+        self.hr = None
+        self.temp = None
+        self.bvp = None
 
 ''' Equalizes array size to match the other one (The larger one gets stripped from his last cells)'''
 def resize_ary(a1, a2):
@@ -65,6 +71,10 @@ def stripDowntime(array, timestamps):
 seed = 42
 np.random.seed(seed)
 
+subjects = list()
+labels_data = json.load(open('data/labels.json'))
+for persons in labels_data["persons"]:
+    subjects.append(Person(persons["time_start"], persons["time_stop"], persons["overall_health"], persons["energetic"], persons["overall_stress"], persons["stressed_past_24h"], persons["sleep_quality_past_24h"], persons["sleep_quality_past_month"], persons["id"]))
 
 data_ary = list()
 
@@ -80,17 +90,19 @@ temp_b = np.genfromtxt(path_b + "TEMP.csv", delimiter=",")
 bvp_b = np.genfromtxt(path_b + "BVP.csv", delimiter=",")
 hr_b = np.genfromtxt(path_b + "HR.csv", delimiter=",")
 
-data_ary.append(eda_a)
-data_ary.append(temp_a)
-data_ary.append(bvp_a)
-data_ary.append(hr_a)
-data_ary.append(eda_b)
-data_ary.append(temp_b)
-data_ary.append(bvp_b)
-data_ary.append(hr_b)
+timestamps_a = np.genfromtxt(path_a + "tags.csv", delimiter=",")
+timestamps_b = np.genfromtxt(path_b + "tags.csv", delimiter=",")
+
+timestart = temp_a[0]
+
+for x in np.nditer(timestamps_b):
+    #print(time.strftime('%H:%M:%S', time.localtime(x)))
+    x = (x - temp_b[0])*4
+    print(x)
+
+
 #eda_b = np.delete(eda_b, np.s_[5000:8500], axis = 0)
 #temp_b = np.delete(temp_b, np.s_[5000:8500], axis = 0)
-#timestamps1 = [(0, 1500), (5310, 8150), (11425, 12493), (16170, 17360), (20800, 21813), (25316, -1)]
 
 temp_freq = temp_a[1]
 hr_freq = hr_a[1]
@@ -102,22 +114,85 @@ bvp_a = bvp_a[2:]
 eda_a = eda_a[2:]
 hr_a = hr_a[2:]
 temp_a = temp_a[2:]
+#b
+bvp_b = bvp_b[2:]
+eda_b = eda_b[2:]
+hr_b = hr_b[2:]
+temp_b = temp_b[2:]
+
+
+#workspace time
+
+plt.plot(np.linspace(0, temp_a.shape[0], temp_a.shape[0]), temp_a)
+for i in range(0, len(timestamps_a)):
+    timestamps_a[i] = int((timestamps_a[i] - timestart)*4)
+    '''plt.annotate('time',
+             xy=(timestamps_a[i], temp_a[int(timestamps_a[i]-2)]), xycoords='data',
+             xytext=(-90, -50), textcoords='offset points', fontsize=16,
+             arrowprops=dict(arrowstyle="->", connectionstyle="arc3,rad=.2"))'''
+    plt.plot([timestamps_a[i], timestamps_a[i]],[22, 36], color='red', linewidth=2.5, linestyle="--")
+plt.show()
+#end
+
+
+
+
 #interpolating missing values
-eda_a = reshape_array_freq(eda_freq,bvp_freq,eda_a)
-hr_a = reshape_array_freq(hr_freq, bvp_freq, hr_a)
-temp_a = reshape_array_freq(temp_freq, bvp_freq, temp_a)
+eda_a = reshape_array_freq(eda_freq,MAX_FREQ,eda_a)
+hr_a = reshape_array_freq(hr_freq, MAX_FREQ, hr_a)
+temp_a = reshape_array_freq(temp_freq, MAX_FREQ, temp_a)
+
+eda_b = reshape_array_freq(eda_freq,MAX_FREQ,eda_b)
+hr_b = reshape_array_freq(hr_freq, MAX_FREQ, hr_b)
+temp_b = reshape_array_freq(temp_freq, MAX_FREQ, temp_b)
 
 
 bvp_a, eda_a = resize_ary(bvp_a, eda_a)
 bvp_a, hr_a = resize_ary(bvp_a, hr_a)
 bvp_a, temp_a = resize_ary(bvp_a, temp_a)
 
-plt.plot(np.linspace(0, eda_a.shape[0], eda_a.shape[0]), eda_a)
-plt.plot(np.linspace(0,bvp_a.shape[0], bvp_a.shape[0]), bvp_a)
-plt.plot(np.linspace(0,hr_a.shape[0], hr_a.shape[0]), hr_a)
-plt.plot(np.linspace(0,temp_a.shape[0], temp_a.shape[0]), temp_a)
-plt.show()
+bvp_b, eda_b = resize_ary(bvp_b, eda_b)
+bvp_b, hr_b = resize_ary(bvp_b, hr_b)
+bvp_b, temp_b = resize_ary(bvp_b, temp_b)
 
-data = np.array((eda_a, temp_a))
+bvp = np.concatenate((bvp_a, bvp_b), axis=0)
+eda = np.concatenate((eda_a, eda_b), axis=0)
+hr = np.concatenate((hr_a, hr_b), axis=0)
+temp = np.concatenate((temp_a, temp_b), axis=0)
+
+
+s_ary = np.empty((bvp.shape[0]))
+for i in range(len(s_ary)):
+    s_ary[i] = 1000 if i % (64*60) == 0 else 0
+
+#temp_a, hr_a = resize_ary(temp_a, hr_a)plt.plot(np.linspace(0, s_ary.shape[0], s_ary.shape[0]), s_ary)
+
+#plt.plot(np.linspace(0, eda.shape[0], eda.shape[0]), eda)
+#plt.plot(np.linspace(0,bvp.shape[0], bvp.shape[0]), bvp)
+#plt.plot(np.linspace(0,hr.shape[0], hr.shape[0]), hr)
+#plt.plot(np.linspace(0,temp.shape[0], temp.shape[0]), temp)
+#plt.plot(np.linspace(0, temp_b.shape[0], temp_b.shape[0]), temp_b)
+#plt.show()
+
+if writing == True:
+    #creating folders
+    for i in range(0, len(subjects)):
+        path = 'data/individual_data/{:d}'.format(i)
+        if not os.path.exists(path):
+            os.makedirs(path)
+#stocking data in person class and writing data
+for s in subjects:
+    s.eda = eda[s.timestamps[0]:s.timestamps[1]]
+    s.hr = hr[s.timestamps[0]:s.timestamps[1]]
+    s.temp = temp[s.timestamps[0]:s.timestamps[1]]
+    s.bvp = bvp[s.timestamps[0]:s.timestamps[1]]
+    if writing == True:
+        np.savetxt('data/individual_data/{:d}/eda.csv'.format(s.id), s.eda, delimiter=' ')
+        np.savetxt('data/individual_data/{:d}/bvp.csv'.format(s.id), s.bvp, delimiter=' ')
+        np.savetxt('data/individual_data/{:d}/temp.csv'.format(s.id), s.temp, delimiter=' ')
+        np.savetxt('data/individual_data/{:d}/hr.csv'.format(s.id), s.hr, delimiter=' ')
+
+data = np.array((bvp, eda, hr, temp))
 data = data.T
-print(data)
+
+print(data.shape)
