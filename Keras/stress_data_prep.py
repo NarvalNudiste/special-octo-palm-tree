@@ -14,9 +14,16 @@ from pprint import pprint
 MAX_FREQ = 64
 writing = False
 
+
+
+
 path_a = "data/URIT_1581_A01212B_2017_10_31_0946/"
 path_b = "data/URIT_1581-A01713-2017_10_31_0949/"
-#TODO Séprarer en activités aussi, plus tard
+#TODO Créer visualisation avec toutes les données + timestamps
+#TODO Créer visualisation avec données labelisées pour chaque personne
+#TODO commence à tester avec une personne
+#TODO ajouter section architecture -> cuda, perfs sans gpu / avec, etc.
+
 
 class Person:
     def __init__(self, start, stop, overall_health, energetic, overall_stress, stressed_past_24h, sleep_quality_past_24h,  sleep_quality_past_month, id):
@@ -67,6 +74,20 @@ def stripDowntime(array, timestamps):
             offset += abs(ts[1]-ts[0])
     return array
 
+def concatenateTime(ary_a, ary_b, timestart_a, timestart_b):
+    for i in range(ary_a.shape[0]):
+        ary_a[i] = ary_a[i] - timestart_a
+    for i in range(ary_b.shape[0]):
+        ary_b[i] = ary_b[i] - timestart_b
+
+    for i in range(ary_b.shape[0]):
+        ary_b[i] = ary_b[i]+ary_a[-1]
+
+    new_ary = np.concatenate((ary_a, ary_b), axis=0)
+    for i in range(new_ary.shape[0]):
+        new_ary[i] = new_ary[i]*64
+    return new_ary
+
 # fix random seed for reproducibility
 seed = 42
 np.random.seed(seed)
@@ -93,7 +114,10 @@ hr_b = np.genfromtxt(path_b + "HR.csv", delimiter=",")
 timestamps_a = np.genfromtxt(path_a + "tags.csv", delimiter=",")
 timestamps_b = np.genfromtxt(path_b + "tags.csv", delimiter=",")
 
-timestart = temp_a[0]
+timestart_a = temp_a[0]
+timestart_b = temp_b[0]
+
+
 
 for x in np.nditer(timestamps_b):
     #print(time.strftime('%H:%M:%S', time.localtime(x)))
@@ -120,23 +144,6 @@ eda_b = eda_b[2:]
 hr_b = hr_b[2:]
 temp_b = temp_b[2:]
 
-
-#workspace time
-
-plt.plot(np.linspace(0, temp_a.shape[0], temp_a.shape[0]), temp_a)
-for i in range(0, len(timestamps_a)):
-    timestamps_a[i] = int((timestamps_a[i] - timestart)*4)
-    '''plt.annotate('time',
-             xy=(timestamps_a[i], temp_a[int(timestamps_a[i]-2)]), xycoords='data',
-             xytext=(-90, -50), textcoords='offset points', fontsize=16,
-             arrowprops=dict(arrowstyle="->", connectionstyle="arc3,rad=.2"))'''
-    plt.plot([timestamps_a[i], timestamps_a[i]],[22, 36], color='red', linewidth=2.5, linestyle="--")
-plt.show()
-#end
-
-
-
-
 #interpolating missing values
 eda_a = reshape_array_freq(eda_freq,MAX_FREQ,eda_a)
 hr_a = reshape_array_freq(hr_freq, MAX_FREQ, hr_a)
@@ -159,20 +166,35 @@ bvp = np.concatenate((bvp_a, bvp_b), axis=0)
 eda = np.concatenate((eda_a, eda_b), axis=0)
 hr = np.concatenate((hr_a, hr_b), axis=0)
 temp = np.concatenate((temp_a, temp_b), axis=0)
+timestamps = concatenateTime(timestamps_a, timestamps_b, timestart_a, timestart_b)
 
 
-s_ary = np.empty((bvp.shape[0]))
-for i in range(len(s_ary)):
-    s_ary[i] = 1000 if i % (64*60) == 0 else 0
+'''
+plt.plot(np.linspace(0, eda.shape[0], eda.shape[0]), eda)
+plt.plot(np.linspace(0,bvp.shape[0], bvp.shape[0]), bvp)
+plt.plot(np.linspace(0,hr.shape[0], hr.shape[0]), hr)
+plt.plot(np.linspace(0,temp.shape[0], temp.shape[0]), temp)
+plt.plot(np.linspace(0, temp_b.shape[0], temp_b.shape[0]), temp_b)
+for i in range(0, len(timestamps)):
+    plt.plot([timestamps[i], timestamps[i]], [0, 1000], color = 'red', linewidth = 2.5, linestyle = "--")
+plt.show()
+'''
 
-#temp_a, hr_a = resize_ary(temp_a, hr_a)plt.plot(np.linspace(0, s_ary.shape[0], s_ary.shape[0]), s_ary)
-
-#plt.plot(np.linspace(0, eda.shape[0], eda.shape[0]), eda)
-#plt.plot(np.linspace(0,bvp.shape[0], bvp.shape[0]), bvp)
-#plt.plot(np.linspace(0,hr.shape[0], hr.shape[0]), hr)
-#plt.plot(np.linspace(0,temp.shape[0], temp.shape[0]), temp)
-#plt.plot(np.linspace(0, temp_b.shape[0], temp_b.shape[0]), temp_b)
-#plt.show()
+#workspace time
+'''
+plt.plot(np.linspace(0, temp_a.shape[0], temp_a.shape[0]), temp_a)
+for i in range(0, len(timestamps_a)):
+    timestamps_a[i] = int((timestamps_a[i] - timestart_a)*64)
+    plt.plot([timestamps_a[i], timestamps_a[i]],[22, 34], color='red', linewidth=2.5, linestyle="--")
+plt.show()'''
+#plotting temp_a with timestamps
+'''
+plt.plot(np.linspace(0, temp_b.shape[0], temp_b.shape[0]), temp_b)
+for i in range(0, len(timestamps_b)):
+    timestamps_b[i] = int((timestamps_b[i] - timestart_b)*64)
+    plt.plot([timestamps_b[i], timestamps_b[i]],[22, 34], color='red', linewidth=2.5, linestyle="--")
+plt.show()'''
+#end
 
 if writing == True:
     #creating folders
