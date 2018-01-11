@@ -22,7 +22,7 @@ While Tensorflow offers a greater degree of freedom, Keras is simpler and more u
 A possible approach could be to use those models before diving into Tensorflow (as time could - and *will* - be a possible limitation).
 Therefore, our main focus will be on Keras.
 
-## Hardware side
+#### Hardware side
 
 Tensorflow backend can run on CPU or GPU, the latter obviously offering better training performances (roughly 8-10x faster, depending on the GPU). In order to run Keras / Tensorflow with GPU support, both nVIDIA's [CUDA](https://developer.nvidia.com/cuda-toolkit) (Compute Unified Device Architecture) Toolkit v8.0 and [cuDNN](https://developer.nvidia.com/cudnn) v6.0 (NVIDIA's deep neural network library) need to be installed on the host system (CUDA v9.0 and cuDNN v7.0 not being supported yet as of january 2018).
 
@@ -203,6 +203,8 @@ My approach was to consider the whole data as a long multidimensional array, res
 
 ![Oops](Keras/pics/oops.png "Oops")
 
+*Oops*
+
 ```python
 # A bit messy
 def concatenate_time(ary_a, ary_b, timestart_a, timestart_b):
@@ -265,7 +267,7 @@ for s in subjects:
     # ...
 ```
 
-## EDA :
+#### EDA :
 
 ![EDA](Keras/pics/EDA/0.png "EDA - #1")
 ![EDA](Keras/pics/EDA/1.png "EDA - #2")
@@ -276,7 +278,7 @@ for s in subjects:
 ![EDA](Keras/pics/EDA/6.png "EDA - #7")
 ![EDA](Keras/pics/EDA/7.png "EDA - #8")
 
-## BVP :
+#### BVP :
 
 ![BVP](Keras/pics/BVP/0.png "BVP - #1")
 ![BVP](Keras/pics/BVP/1.png "BVP - #2")
@@ -287,7 +289,7 @@ for s in subjects:
 ![BVP](Keras/pics/BVP/6.png "BVP - #7")
 ![BVP](Keras/pics/BVP/7.png "BVP - #8")
 
-## HR :
+#### HR :
 
 ![HR](Keras/pics/HR/0.png "HR - #1")
 ![HR](Keras/pics/HR/1.png "HR - #2")
@@ -298,7 +300,7 @@ for s in subjects:
 ![HR](Keras/pics/HR/6.png "HR - #7")
 ![HR](Keras/pics/HR/7.png "HR - #8")
 
-## TEMP :
+#### TEMP :
 
 ![TEMP](Keras/pics/TEMP/0.png "TEMP - #1")
 ![TEMP](Keras/pics/TEMP/1.png "TEMP - #2")
@@ -308,5 +310,3 @@ for s in subjects:
 ![TEMP](Keras/pics/TEMP/5.png "TEMP - #6")
 ![TEMP](Keras/pics/TEMP/6.png "TEMP - #7")
 ![TEMP](Keras/pics/TEMP/7.png "TEMP - #8")
-
-That's all for today, folks
