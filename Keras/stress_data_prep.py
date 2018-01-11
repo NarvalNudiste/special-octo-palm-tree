@@ -39,6 +39,47 @@ class Person:
         self.hr = None
         self.temp = None
         self.bvp = None
+        self.tags = None
+    def correct_time(self):
+        for i in range(0, len(self.tags)):
+            self.tags[i] = self.tags[i] - self.timestamps[0]
+    def pprint(self):
+        plt.plot(np.linspace(0, self.eda.shape[0], self.eda.shape[0]), self.eda, label="EDA")
+        plt.plot(np.linspace(0, self.bvp.shape[0], self.bvp.shape[0]), self.bvp, label="BVP")
+        plt.plot(np.linspace(0, self.hr.shape[0], self.hr.shape[0]), self.hr, label="HR")
+        plt.plot(np.linspace(0, self.temp.shape[0], self.temp.shape[0]), self.temp, label="temperature")
+        for i in range(0, len(self.tags)):
+            plt.plot([self.tags[i], self.tags[i]], [1, 1000], color = 'red', linewidth = 2.5, linestyle = "--")
+        plt.show()
+    def pprint_eda(self):
+        plt.plot(np.linspace(0, self.eda.shape[0], self.eda.shape[0]), self.eda)
+        plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+            ncol=1, mode="expand", borderaxespad=0.)
+        for i in range(0, len(self.tags)):
+            plt.plot([self.tags[i], self.tags[i]], [np.amin(self.eda), np.amax(self.eda)], color = 'red', linewidth = 2.5, linestyle = "--", label="EDA")
+        plt.show()
+    def pprint_bvp(self):
+        plt.plot(np.linspace(0, self.bvp.shape[0], self.bvp.shape[0]), self.bvp)
+        plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+           ncol=1, mode="expand", borderaxespad=0.)
+        for i in range(0, len(self.tags)):
+            plt.plot([self.tags[i], self.tags[i]], [np.amin(self.bvp), np.amax(self.bvp)], color = 'red', linewidth = 2.5, linestyle = "--", label="BVP")
+        plt.show()
+    def pprint_temp(self):
+        plt.plot(np.linspace(0, self.temp.shape[0], self.temp.shape[0]), self.temp)
+        plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+           ncol=1, mode="expand", borderaxespad=0.)
+        for i in range(0, len(self.tags)):
+            plt.plot([self.tags[i], self.tags[i]], [np.amin(self.temp), np.amax(self.temp)], color = 'red', linewidth = 2.5, linestyle = "--", label="Temperature")
+        plt.show()
+    def pprint_hr(self):
+        plt.plot(np.linspace(0, self.hr.shape[0], self.hr.shape[0]), self.hr)
+        plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
+           ncol=1, mode="expand", borderaxespad=0.)
+        for i in range(0, len(self.tags)):
+            plt.plot([self.tags[i], self.tags[i]], [np.amin(self.hr), np.amax(self.hr)], color = 'red', linewidth = 2.5, linestyle = "--", label="HR")
+        plt.show()
+
 
 ''' Equalizes array size to match the other one (The larger one gets stripped from his last cells)'''
 def resize_ary(a1, a2):
@@ -169,16 +210,15 @@ temp = np.concatenate((temp_a, temp_b), axis=0)
 timestamps = concatenateTime(timestamps_a, timestamps_b, timestart_a, timestart_b)
 
 
-'''
+
 plt.plot(np.linspace(0, eda.shape[0], eda.shape[0]), eda)
 plt.plot(np.linspace(0,bvp.shape[0], bvp.shape[0]), bvp)
 plt.plot(np.linspace(0,hr.shape[0], hr.shape[0]), hr)
 plt.plot(np.linspace(0,temp.shape[0], temp.shape[0]), temp)
 plt.plot(np.linspace(0, temp_b.shape[0], temp_b.shape[0]), temp_b)
 for i in range(0, len(timestamps)):
-    plt.plot([timestamps[i], timestamps[i]], [0, 1000], color = 'red', linewidth = 2.5, linestyle = "--")
+    plt.plot([timestamps[i], timestamps[i]], [22, 34], color = 'red', linewidth = 2.5, linestyle = "--")
 plt.show()
-'''
 
 #workspace time
 '''
@@ -203,16 +243,31 @@ if writing == True:
         if not os.path.exists(path):
             os.makedirs(path)
 #stocking data in person class and writing data
+print(timestamps)
 for s in subjects:
     s.eda = eda[s.timestamps[0]:s.timestamps[1]]
     s.hr = hr[s.timestamps[0]:s.timestamps[1]]
     s.temp = temp[s.timestamps[0]:s.timestamps[1]]
     s.bvp = bvp[s.timestamps[0]:s.timestamps[1]]
+    s.tags = timestamps[np.where(np.logical_and(timestamps>=s.timestamps[0],timestamps<=s.timestamps[1]))]
+    print("Subject id :", s.id, " -> tags = ", s.tags)
     if writing == True:
         np.savetxt('data/individual_data/{:d}/eda.csv'.format(s.id), s.eda, delimiter=' ')
         np.savetxt('data/individual_data/{:d}/bvp.csv'.format(s.id), s.bvp, delimiter=' ')
         np.savetxt('data/individual_data/{:d}/temp.csv'.format(s.id), s.temp, delimiter=' ')
         np.savetxt('data/individual_data/{:d}/hr.csv'.format(s.id), s.hr, delimiter=' ')
+
+for s in subjects:
+    s.correct_time()
+#for s in subjects:
+#    s.pprint_eda()
+#for s in subjects:
+#    s.pprint_hr()
+
+#for s in subjects:
+#    s.pprint_temp()
+for s in subjects:
+    s.pprint_bvp()
 
 data = np.array((bvp, eda, hr, temp))
 data = data.T

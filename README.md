@@ -16,11 +16,17 @@ The old model will obviously use the same dataset to get relevant performance co
 
 ### Tensorflow / Keras
 
-Keras now supports and uses Tensorflow (in addition of Theano) - it can be seen as an higher level library using tf - and will shortly be integrated to it. 
+Keras now supports and uses Tensorflow (in addition of Theano) - it can be seen as an higher level library using tf - and will shortly be integrated to it.
 It can be used to quickly create complex models with minimal code. Tensorflow is more of a language than a framework, providing its own syntax to develop machine learning models.
-While Tensorflow offers a greater degree of freedom, Keras is simpler and more user oriented. Like Scikit-learn, it provides pre-defined models (allowing users to define their own). 
+While Tensorflow offers a greater degree of freedom, Keras is simpler and more user oriented. Like Scikit-learn, it provides pre-defined models (allowing users to define their own).
 A possible approach could be to use those models before diving into Tensorflow (as time could - and *will* - be a possible limitation).
-Therefore, our main focus will be on Keras. 
+Therefore, our main focus will be on Keras.
+
+## Hardware side
+
+Tensorflow backend can run on CPU or GPU, the latter obviously offering better training performances (roughly 8-10x faster, depending on the GPU). In order to run Keras / Tensorflow with GPU support, both nVIDIA's [CUDA](https://developer.nvidia.com/cuda-toolkit) (Compute Unified Device Architecture) Toolkit v8.0 and [cuDNN](https://developer.nvidia.com/cudnn) v6.0 (NVIDIA's deep neural network library) need to be installed on the host system (CUDA v9.0 and cuDNN v7.0 not being supported yet as of january 2018).
+
+The whole project ran on a modest i7-5700HQ / GTX 980M.
 
 ### Requirements
 
@@ -29,7 +35,7 @@ Therefore, our main focus will be on Keras.
   * Various tests with sci-kit's SVM classifier on provided sample data (iris, digits)
   * First implementation with small E4 datasets
   * Proper implementation with the actual database
-	
+
 2. Deep Learning approach
   * Familiarization with Deep Learning key concepts
   * Familiarization with Tensorflow and Keras libraries
@@ -40,39 +46,39 @@ Therefore, our main focus will be on Keras.
   * Stress workshop planning
   * Actual data collection
   * Data pre-processing
-  
+
 4. Keras implementation
   * Model creation
   * Training and adjusments
   * (Optional) Tensorflow approach
 
-5. Accuracy comparison 
-  * Figuring a way to compare algorithms performance (False negative, false positive, etc.) 
+5. Accuracy comparison
+  * Figuring a way to compare algorithms performance (False negative, false positive, etc.)
   * Some visual representations
   * Preparing data for visualization
   * Coordination with the team
-  
+
 6. Documentation
   * Sphinx documentation
   * Ad-hoc LaTeX report
-  
+
 ### Neural networks basics
-  
+
 At the core of every neural network is the perceptron, which dates back to the late 1950's. Invented by Frank Rosenblatt, the perceptron was largely inspired by neurobiology as it mimics neurons basic behaviour: a neuron takes an input and then choose to fire or not fire depending on input's value.
 The function used to determine if a neuron is activated is called the activation function : it is often a non-linear function (Sigmoid, ArcTan, ReLU), as most real-world problems are non-linear indeed.
 
-Perceptrons can produce one or several ouputs; they can can also be stacked, resulting in a multi-layer perceptron (MLP). 
+Perceptrons can produce one or several ouputs; they can can also be stacked, resulting in a multi-layer perceptron (MLP).
 The most basic MLP contains an input layer, an hidden layer and an output layer. As additionnals hidden layers are stacked on the top of each others, our basic MLP transitions into a deep neural network.
 
 ### Keras basics
 
-Keras provides us with easy ways to quickly build a model : 
+Keras provides us with easy ways to quickly build a model :
 
 ```python
 model = Sequential()
 ```
 
-Layers can then be stacked on top of each other this way : 
+Layers can then be stacked on top of each other this way :
 
 ```python
 model.add(Dense(32, input_shape=(*, 16))) # input arrays of shape (*, 16) and output arrays of shape (*, 32)
@@ -87,9 +93,9 @@ model.compile(optimizer='rmsprop',
               loss='categorical_crossentropy',
               metrics=['accuracy'])
 ```
-A lot of optimizers are available in Keras, such as stochastic gradient descent, RMSprop (often good for recurrent neural networks), ADAM .. the whole list is available in the [keras documentation.](https://keras.io/optimizers/) 
+A lot of optimizers are available in Keras, such as stochastic gradient descent, RMSprop (often good for recurrent neural networks), ADAM .. the whole list is available in the [keras documentation.](https://keras.io/optimizers/)
 
-After compilation, the model can be trained & evaluated: 
+After compilation, the model can be trained & evaluated:
 
 ```python
 model.fit(data, labels, epochs=10, batch_size=32) #epochs are the number of passes
@@ -103,16 +109,35 @@ score = model.evaluate(x_test, y_test, batch_size=128)
 Thoses performances comparison comes from multiple training sessions on the pima diabetes dataset.
 Models have been tested with different hidden layers and neurons numbers (from 1x1 to 64x64), with or without Dropout layers, and each time for 5 different optimizers.
 Overall, the Rectifier activation function (ReLU) seems to be the best choice for binary classification on this dataset.
-As this may vary on differnt data structure, I think repeating those tests with the proper data can help finding a suitable model. 
+As this may vary on different data structure, I think repeating those tests with the proper data can help finding a suitable model.
 
 
 ### Data collection / Workshop
 
+A data collection workshop has been run internally. Volunteers students answered a small survey (general health condition, how energetic they overall feel, stress level, etc.) and took part of the following test (wristband obviously equipped) :
+
+* Listening to a short relaxing music
+* Listening to a stressful music
+* Watching a short horror trailer
+* Playing a ZType game
+
+Subjects were asked if they felt a difference after each activity (more relaxed, a bit more relaxed, a bit more stressed, more stressed, neutral response).
+Data was then downloaded from the Empatica cloud as .csv files :
+
+* **TEMP.csv** -  Data from temperature sensor expressed degrees on the Celsius (°C) scale.
+
+* **EDA.csv** - Data from the electrodermal activity sensor expressed as microsiemens (μS).
+
+* **BVP.csv** - Data from photoplethysmograph.
+
+* **HR.csv** - Average heart rate extracted from the BVP signal.The first row is the initial time of the session expressed as unix timestamp in UTC. The second row is the sample rate expressed in Hz.
+
+* **tags.csv** - Event mark times. Each row corresponds to a physical button press on the device; the same time as the status LED is first illuminated. The time is expressed as a unix timestamp in UTC and it is synchronized with initial time of the session indicated in the related data files from the corresponding session.
 
 ### Data pre-processing
 
-All E4 wristband sensors deliver different data formats, as the sample rate may vary : the photoplethysmograph sensor (BVP) has a 64Hz sample rate, whereas the electrodermal activity sensor sensor (EDA) only samples at 4Hz. 
-Thus, we need a function using linear interpolation to even out our arrays  : 
+All E4 wristband sensors deliver different data formats, as the sample rate may vary : the photoplethysmograph sensor (BVP) has a 64Hz sample rate, whereas the electrodermal activity sensor sensor (EDA) only samples at 4Hz.
+Thus, we need a function using linear interpolation to even out our arrays  :
 
 ```python
 def reshape_array_freq(bFreq, freq, ary):
@@ -139,7 +164,7 @@ def resize_ary(a1, a2):
     else:
         a1 = a1[:-diff]
     return a1, a2
-``` 
+```
 
 ![Formatted data](Keras/pics/r_plot_all.png "Formatted data")
 
@@ -148,20 +173,140 @@ Our data being properly formatted, we then use JSON to store labels from the dat
 
 ```json
 {
-  "person" : {
+  "persons" : [
+    {
     "id" : 0,
     "file" : "a",
-    "time_start" :,
-    "time_stop" :,
+    "time_start" : 25774,
+    "time_stop" : 85175,
     "overall_health" : 2,
     "energetic" : 2,
     "overall_stress" : 3,
     "stressed_past_24h" : 3,
     "sleep_quality_past_24h" : 2,
-    "sleep_quality_past_month" : 1
+    "sleep_quality_past_month" : 1,
+    "tag_relaxed_m" : 29106,
+    "tag_stressful_m" : 43013,
+    "tag_trailer" : 55472,
+    "tag_game" : 74981,
+    "reliable" : 1
   }
+  {
+    "..." : "..."
+  }
+]
 }
 ```
 
 Later on, those labels will hopefully help our classifier.
+My approach was to consider the whole data as a long multidimensional array, resampled to 64Hz. As data collection was done in parallel with two wristbands, I had a few issues putting the time tags at the right place :
 
+![Oops](Keras/pics/oops.png "Oops")
+
+```python
+# A bit messy
+def concatenate_time(ary_a, ary_b, timestart_a, timestart_b):
+    for i in range(ary_a.shape[0]):
+        ary_a[i] = ary_a[i] - timestart_a
+    for i in range(ary_b.shape[0]):
+        ary_b[i] = ary_b[i] - timestart_b
+
+    for i in range(ary_b.shape[0]):
+        ary_b[i] = ary_b[i]+ary_a[-1]
+
+    new_ary = np.concatenate((ary_a, ary_b), axis=0)
+    for i in range(new_ary.shape[0]):
+        new_ary[i] = new_ary[i]*MAXFREQ
+    return new_ary
+```
+
+A *Person* class is used to store individual data according to the JSON file :
+
+```python
+class Person:
+    def __init__(self, start, stop, overall_health, energetic, overall_stress, stressed_past_24h, sleep_quality_past_24h,  sleep_quality_past_month, id):
+        self.timestamps = (start, stop)
+        self.overall_health = overall_health
+        self.energetic = energetic
+        self.overall_stress = overall_stress
+        self.stressed_past_24h = stressed_past_24h
+        self.sleep_quality_past_24h = sleep_quality_past_24h
+        self.sleep_quality_past_month = sleep_quality_past_month
+        self.id = id
+        self.eda = None
+        self.hr = None
+        self.temp = None
+        self.bvp = None
+        self.tags = None
+
+    def correct_time(self):
+        for i in range(0, len(self.tags)):
+            self.tags[i] = self.tags[i] - self.timestamps[0]
+
+    def pprint_eda(self):
+        plt.plot(np.linspace(0, self.eda.shape[0], self.eda.shape[0]), self.eda)
+        for i in range(0, len(self.tags)):
+            plt.plot([self.tags[i], self.tags[i]], [np.amin(self.eda), np.amax(self.eda)], color = 'red', linewidth = 2.5, linestyle = "--", label="EDA")
+        plt.show()
+    # ...
+
+subjects = list()
+labels_data = json.load(open('data/labels.json'))
+    for persons in labels_data["persons"]:
+        subjects.append(Person(persons["time_start"], persons["time_stop"], persons["overall_health"], persons["energetic"], persons["overall_stress"], persons["stressed_past_24h"], persons["sleep_quality_past_24h"], persons["sleep_quality_past_month"], persons["id"]))
+    # ...
+
+for s in subjects:
+    s.eda = eda[s.timestamps[0]:s.timestamps[1]]
+    s.hr = hr[s.timestamps[0]:s.timestamps[1]]
+    s.temp = temp[s.timestamps[0]:s.timestamps[1]]
+    s.bvp = bvp[s.timestamps[0]:s.timestamps[1]]
+    s.tags = timestamps[np.where(np.logical_and(timestamps>=s.timestamps[0],timestamps<=s.timestamps[1]))]
+    # ...
+```
+
+## EDA :
+
+![EDA](Keras/pics/EDA/0.png "EDA - #1")
+![EDA](Keras/pics/EDA/1.png "EDA - #2")
+![EDA](Keras/pics/EDA/2.png "EDA - #3")
+![EDA](Keras/pics/EDA/3.png "EDA - #4")
+![EDA](Keras/pics/EDA/4.png "EDA - #5")
+![EDA](Keras/pics/EDA/5.png "EDA - #6")
+![EDA](Keras/pics/EDA/6.png "EDA - #7")
+![EDA](Keras/pics/EDA/7.png "EDA - #8")
+
+## BVP :
+
+![BVP](Keras/pics/BVP/0.png "BVP - #1")
+![BVP](Keras/pics/BVP/1.png "BVP - #2")
+![BVP](Keras/pics/BVP/2.png "BVP - #3")
+![BVP](Keras/pics/BVP/3.png "BVP - #4")
+![BVP](Keras/pics/BVP/4.png "BVP - #5")
+![BVP](Keras/pics/BVP/5.png "BVP - #6")
+![BVP](Keras/pics/BVP/6.png "BVP - #7")
+![BVP](Keras/pics/BVP/7.png "BVP - #8")
+
+## HR :
+
+![HR](Keras/pics/HR/0.png "HR - #1")
+![HR](Keras/pics/HR/1.png "HR - #2")
+![HR](Keras/pics/HR/2.png "HR - #3")
+![HR](Keras/pics/HR/3.png "HR - #4")
+![HR](Keras/pics/HR/4.png "HR - #5")
+![HR](Keras/pics/HR/5.png "HR - #6")
+![HR](Keras/pics/HR/6.png "HR - #7")
+![HR](Keras/pics/HR/7.png "HR - #8")
+
+## TEMP :
+
+![TEMP](Keras/pics/TEMP/0.png "TEMP - #1")
+![TEMP](Keras/pics/TEMP/1.png "TEMP - #2")
+![TEMP](Keras/pics/TEMP/2.png "TEMP - #3")
+![TEMP](Keras/pics/TEMP/3.png "TEMP - #4")
+![TEMP](Keras/pics/TEMP/4.png "TEMP - #5")
+![TEMP](Keras/pics/TEMP/5.png "TEMP - #6")
+![TEMP](Keras/pics/TEMP/6.png "TEMP - #7")
+![TEMP](Keras/pics/TEMP/7.png "TEMP - #8")
+
+That's all for today, folks
