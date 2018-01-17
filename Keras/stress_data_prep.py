@@ -9,24 +9,16 @@ import matplotlib.pyplot as plt
 from labelizer import labelize
 import time
 import json
-from pprint import pprint
+import gc
 
 MAX_FREQ = 64
 writing = False
 
-
-
-
 path_a = "data/URIT_1581_A01212B_2017_10_31_0946/"
 path_b = "data/URIT_1581-A01713-2017_10_31_0949/"
-#TODO Créer visualisation avec toutes les données + timestamps
-#TODO Créer visualisation avec données labelisées pour chaque personne
-#TODO commence à tester avec une personne
-#TODO ajouter section architecture -> cuda, perfs sans gpu / avec, etc.
-
 
 class Person:
-    def __init__(self, start, stop, overall_health, energetic, overall_stress, stressed_past_24h, sleep_quality_past_24h,  sleep_quality_past_month, id):
+    def __init__(self, start, stop, overall_health, energetic, overall_stress, stressed_past_24h, sleep_quality_past_24h,  sleep_quality_past_month, id, reliable):
         self.timestamps = (start, stop)
         self.overall_health = overall_health
         self.energetic = energetic
@@ -40,9 +32,38 @@ class Person:
         self.temp = None
         self.bvp = None
         self.tags = None
+        self.binary_output = None
+        self.multiclass_ouput = None
+        self.reliable = reliable
+
+    def prepare_data_binary(self):
+        length = self.bvp.shape[0]
+        self.correct_time()
+        self.binary_output = np.empty(self.bvp.shape[0])
+        for i in range(length):
+            if i < self.tags[0]:
+                self.binary_output[i] = 0.0
+            else:
+                self.binary_output[i] = 1.0
+
+    def prepare_data_multiclass(self):
+                length = self.bvp.shape[0]
+                self.correct_time()
+                self.multiclass_output = np.empty(self.bvp.shape[0])
+                for i in range(length):
+                    if i < self.tags[0]:
+                        self.multiclass_output[i] = 0
+                    elif i < self.tags[1]:
+                        self.multiclass_output[i] = 1
+                    elif i < self.tags[2]:
+                        self.multiclass_output[i] = 2
+                    else:
+                        self.multiclass_output[i] = 3
+
     def correct_time(self):
         for i in range(0, len(self.tags)):
             self.tags[i] = self.tags[i] - self.timestamps[0]
+
     def pprint(self):
         plt.plot(np.linspace(0, self.eda.shape[0], self.eda.shape[0]), self.eda, label="EDA")
         plt.plot(np.linspace(0, self.bvp.shape[0], self.bvp.shape[0]), self.bvp, label="BVP")
@@ -80,6 +101,23 @@ class Person:
             plt.plot([self.tags[i], self.tags[i]], [np.amin(self.hr), np.amax(self.hr)], color = 'red', linewidth = 2.5, linestyle = "--", label="HR")
         plt.show()
 
+''' Fix missing timestamps '''
+def fix_subjects():
+    for s in subjects:
+        if s.reliable is 0:
+            if s.id is 2:
+                print("2")
+                s.tags[0] = 1850
+                s.tags[1] = 17175
+                print(s.tags)
+
+            elif s.id is 5:
+                last = s.tags[1]
+                s.tags[1] = 16165
+                s.tags = np.append([27685], s.tags)
+                s.tags = np.append([last], s.tags)
+                print("5")
+                print(s.tags)
 
 ''' Equalizes array size to match the other one (The larger one gets stripped from his last cells)'''
 def resize_ary(a1, a2):
@@ -134,12 +172,15 @@ seed = 42
 np.random.seed(seed)
 
 subjects = list()
+print("loading json labels ..")
 labels_data = json.load(open('data/labels.json'))
 for persons in labels_data["persons"]:
-    subjects.append(Person(persons["time_start"], persons["time_stop"], persons["overall_health"], persons["energetic"], persons["overall_stress"], persons["stressed_past_24h"], persons["sleep_quality_past_24h"], persons["sleep_quality_past_month"], persons["id"]))
+    subjects.append(Person(persons["time_start"], persons["time_stop"], persons["overall_health"], persons["energetic"], persons["overall_stress"], persons["stressed_past_24h"], persons["sleep_quality_past_24h"], persons["sleep_quality_past_month"], persons["id"], persons["reliable"]))
+
 
 data_ary = list()
 
+print("loading data from csv files ..")
 #loading data
 #TODO find a data structure for ACC and IBI
 eda_a = np.genfromtxt(path_a + "EDA.csv", delimiter=",")
@@ -158,17 +199,6 @@ timestamps_b = np.genfromtxt(path_b + "tags.csv", delimiter=",")
 timestart_a = temp_a[0]
 timestart_b = temp_b[0]
 
-
-
-for x in np.nditer(timestamps_b):
-    #print(time.strftime('%H:%M:%S', time.localtime(x)))
-    x = (x - temp_b[0])*4
-    print(x)
-
-
-#eda_b = np.delete(eda_b, np.s_[5000:8500], axis = 0)
-#temp_b = np.delete(temp_b, np.s_[5000:8500], axis = 0)
-
 temp_freq = temp_a[1]
 hr_freq = hr_a[1]
 bvp_freq = bvp_a[1]
@@ -185,6 +215,7 @@ eda_b = eda_b[2:]
 hr_b = hr_b[2:]
 temp_b = temp_b[2:]
 
+print("resampling arrays ..")
 #interpolating missing values
 eda_a = reshape_array_freq(eda_freq,MAX_FREQ,eda_a)
 hr_a = reshape_array_freq(hr_freq, MAX_FREQ, hr_a)
@@ -194,7 +225,7 @@ eda_b = reshape_array_freq(eda_freq,MAX_FREQ,eda_b)
 hr_b = reshape_array_freq(hr_freq, MAX_FREQ, hr_b)
 temp_b = reshape_array_freq(temp_freq, MAX_FREQ, temp_b)
 
-
+print("resizing arrays .. ")
 bvp_a, eda_a = resize_ary(bvp_a, eda_a)
 bvp_a, hr_a = resize_ary(bvp_a, hr_a)
 bvp_a, temp_a = resize_ary(bvp_a, temp_a)
@@ -203,6 +234,7 @@ bvp_b, eda_b = resize_ary(bvp_b, eda_b)
 bvp_b, hr_b = resize_ary(bvp_b, hr_b)
 bvp_b, temp_b = resize_ary(bvp_b, temp_b)
 
+print("concatening arrays .. ")
 bvp = np.concatenate((bvp_a, bvp_b), axis=0)
 eda = np.concatenate((eda_a, eda_b), axis=0)
 hr = np.concatenate((hr_a, hr_b), axis=0)
@@ -210,7 +242,7 @@ temp = np.concatenate((temp_a, temp_b), axis=0)
 timestamps = concatenateTime(timestamps_a, timestamps_b, timestart_a, timestart_b)
 
 
-
+'''
 plt.plot(np.linspace(0, eda.shape[0], eda.shape[0]), eda)
 plt.plot(np.linspace(0,bvp.shape[0], bvp.shape[0]), bvp)
 plt.plot(np.linspace(0,hr.shape[0], hr.shape[0]), hr)
@@ -219,6 +251,7 @@ plt.plot(np.linspace(0, temp_b.shape[0], temp_b.shape[0]), temp_b)
 for i in range(0, len(timestamps)):
     plt.plot([timestamps[i], timestamps[i]], [22, 34], color = 'red', linewidth = 2.5, linestyle = "--")
 plt.show()
+'''
 
 #workspace time
 '''
@@ -243,33 +276,63 @@ if writing == True:
         if not os.path.exists(path):
             os.makedirs(path)
 #stocking data in person class and writing data
-print(timestamps)
+#print(timestamps)
+print("storing data in Person class")
 for s in subjects:
     s.eda = eda[s.timestamps[0]:s.timestamps[1]]
     s.hr = hr[s.timestamps[0]:s.timestamps[1]]
     s.temp = temp[s.timestamps[0]:s.timestamps[1]]
     s.bvp = bvp[s.timestamps[0]:s.timestamps[1]]
     s.tags = timestamps[np.where(np.logical_and(timestamps>=s.timestamps[0],timestamps<=s.timestamps[1]))]
-    print("Subject id :", s.id, " -> tags = ", s.tags)
+    print("generating binary classes")
+    s.prepare_data_binary()
+    #print("generating multiclass")
+    #s.prepare_data_multiclass()
+    #print("Subject id :", s.id, " -> tags = ", s.tags)
     if writing == True:
         np.savetxt('data/individual_data/{:d}/eda.csv'.format(s.id), s.eda, delimiter=' ')
         np.savetxt('data/individual_data/{:d}/bvp.csv'.format(s.id), s.bvp, delimiter=' ')
         np.savetxt('data/individual_data/{:d}/temp.csv'.format(s.id), s.temp, delimiter=' ')
         np.savetxt('data/individual_data/{:d}/hr.csv'.format(s.id), s.hr, delimiter=' ')
 
-for s in subjects:
-    s.correct_time()
-#for s in subjects:
-#    s.pprint_eda()
-#for s in subjects:
-#    s.pprint_hr()
+
+eda_a = None
+eda_b = None
+hr_b = None
+hr_a = None
+temp_a = None
+temp_b = None
+eda_a = None
+eda_b = None
+gc.collect()
 
 #for s in subjects:
-#    s.pprint_temp()
+#    s.correct_time()
+
+fix_subjects()
+
+
+#for s in subjects:
+    #if s.id is 2 or s.id is 5:
+        #s.pprint_eda()
+'''
+for s in subjects:
+    s.pprint_hr()
+
+for s in subjects:
+    s.pprint_temp()
+
 for s in subjects:
     s.pprint_bvp()
+'''
 
-data = np.array((bvp, eda, hr, temp))
+
+'''
+
+bvp, eda = resize_ary(bvp, eda)
+bvp, hr = resize_ary(bvp, hr)
+data = np.array((bvp, eda, hr))
 data = data.T
 
-print(data.shape)
+print("data loaded.")
+'''
