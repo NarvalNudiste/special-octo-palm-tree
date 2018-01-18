@@ -273,5 +273,9 @@ for s in subjects:
 
 ### Input / Ouput format
 
-
 ![Diagram](Keras/pics/NN_diagram.png)
+
+### Results
+
+First results don't include data personalization but are pretty good : 
+
