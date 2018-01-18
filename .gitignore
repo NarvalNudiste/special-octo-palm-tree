@@ -1,4 +1,4 @@
-# data 
+# data
 SVM/data/
 SVM/html/
 SVM/old/
@@ -6,7 +6,7 @@ SVM/saves/
 SVM/cnn/
 
 Keras/.ipnyb_checkpoints
-Keras/data/
+Keras/data/old
 Keras/logs/
 
 # Byte-compiled / optimized / DLL files

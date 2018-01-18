@@ -267,46 +267,11 @@ for s in subjects:
     # ...
 ```
 
-#### EDA :
+### Individual data
 
-![EDA](Keras/pics/EDA/0.png "EDA - #1")
-![EDA](Keras/pics/EDA/1.png "EDA - #2")
-![EDA](Keras/pics/EDA/2.png "EDA - #3")
-![EDA](Keras/pics/EDA/3.png "EDA - #4")
-![EDA](Keras/pics/EDA/4.png "EDA - #5")
-![EDA](Keras/pics/EDA/5.png "EDA - #6")
-![EDA](Keras/pics/EDA/6.png "EDA - #7")
-![EDA](Keras/pics/EDA/7.png "EDA - #8")
+[Individual data](docs/INDIVIDUAL_DATA.md), separated by signal type.
 
-#### BVP :
+### Input / Ouput format
 
-![BVP](Keras/pics/BVP/0.png "BVP - #1")
-![BVP](Keras/pics/BVP/1.png "BVP - #2")
-![BVP](Keras/pics/BVP/2.png "BVP - #3")
-![BVP](Keras/pics/BVP/3.png "BVP - #4")
-![BVP](Keras/pics/BVP/4.png "BVP - #5")
-![BVP](Keras/pics/BVP/5.png "BVP - #6")
-![BVP](Keras/pics/BVP/6.png "BVP - #7")
-![BVP](Keras/pics/BVP/7.png "BVP - #8")
 
-#### HR :
-
-![HR](Keras/pics/HR/0.png "HR - #1")
-![HR](Keras/pics/HR/1.png "HR - #2")
-![HR](Keras/pics/HR/2.png "HR - #3")
-![HR](Keras/pics/HR/3.png "HR - #4")
-![HR](Keras/pics/HR/4.png "HR - #5")
-![HR](Keras/pics/HR/5.png "HR - #6")
-![HR](Keras/pics/HR/6.png "HR - #7")
-![HR](Keras/pics/HR/7.png "HR - #8")
-
-#### TEMP :
-
-![TEMP](Keras/pics/TEMP/0.png "TEMP - #1")
-![TEMP](Keras/pics/TEMP/1.png "TEMP - #2")
-![TEMP](Keras/pics/TEMP/2.png "TEMP - #3")
-![TEMP](Keras/pics/TEMP/3.png "TEMP - #4")
-![TEMP](Keras/pics/TEMP/4.png "TEMP - #5")
-![TEMP](Keras/pics/TEMP/5.png "TEMP - #6")
-![TEMP](Keras/pics/TEMP/6.png "TEMP - #7")
-![TEMP](Keras/pics/TEMP/7.png "TEMP - #8")
+![Diagram](Keras/pics/NN_diagram.png)
