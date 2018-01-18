@@ -22,6 +22,8 @@ While Tensorflow offers a greater degree of freedom, Keras is simpler and more u
 A possible approach could be to use those models before diving into Tensorflow (as time could - and *will* - be a possible limitation).
 Therefore, our main focus will be on Keras.
 
+[Keras install guide](docs/INSTALL_GUIDE.md)
+
 #### Hardware side
 
 Tensorflow backend can run on CPU or GPU, the latter obviously offering better training performances (roughly 8-10x faster, depending on the GPU). In order to run Keras / Tensorflow with GPU support, both nVIDIA's [CUDA](https://developer.nvidia.com/cuda-toolkit) (Compute Unified Device Architecture) Toolkit v8.0 and [cuDNN](https://developer.nvidia.com/cudnn) v6.0 (NVIDIA's deep neural network library) need to be installed on the host system (CUDA v9.0 and cuDNN v7.0 not being supported yet as of january 2018).
@@ -277,5 +279,13 @@ for s in subjects:
 
 ### Results
 
-First results don't include data personalization but are pretty good : 
+First results don't include data personalization but still are pretty good :
 
+Binary classifier, statified cross-validation (80% training data, 20% data, 5 pass) :
+```
+acc: 90.63%
+91.62% (+/- 0.83%)
+time elapsed :  357.99447441101074  s
+```
+
+We'll see later if data personalization can help improve our result.
