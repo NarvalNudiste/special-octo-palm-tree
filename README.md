@@ -275,13 +275,9 @@ def load_all_subjects():
 	for i in range(len(subjects)):
 		if i is 0:
 			X = np.array((subjects[i].hr, subjects[i].bvp, subjects[i].eda))
-			print("first pass : X = ", X.shape)
 			Y = np.array((subjects[i].binary_output))
 		else:
-			print("second pass : nparray = ", np.array((subjects[i].hr, subjects[i].bvp, subjects[i].eda)).shape)
-			print("second pass : X  =", X.shape)
 			X = np.concatenate((X, np.array((subjects[i].hr, subjects[i].bvp, subjects[i].eda))), axis=1)
-			print(X.shape)
 			Y = np.concatenate((Y, np.array((subjects[i].binary_output))), axis=0)
 	X = X.T
 	return X, Y
