@@ -9,16 +9,16 @@ Physiological data samples will be provided by the E4 *empatica* wristband.
 
 # Table of contents
 1. [Introduction](#introduction)
-2. [Tensorflow / Keras](#tensorflow)
-    1. [Hardware side](#hardware)
+2. [Tensorflow / Keras](#tensorflow--keras)
+    1. [Hardware side](#hardware-side)
 3. [Requirements](#requirements)
-4. [Neural networks basics](#neural)
-5. [Keras basics](#keras)
-6. [Performances Comparison](#performances)
+4. [Neural networks basics](#neural-networks-basics)
+5. [Keras basics](#keras-basics)
+6. [Performances Comparison](#performances-comparison)
 7. [Data Collection / Workshop](#data-collection)
 8. [Data pre-processing](#data-pre-processing)
 9. [Individual data](#individual-data)
-10. [Input / Ouput format](#input)
+10. [Input / Ouput format](#input--ouput-format)
 11. [Results](#results)
 12. [Conclusion](#conclusion)
 
