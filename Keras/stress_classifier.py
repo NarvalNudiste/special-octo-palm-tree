@@ -9,6 +9,21 @@ from sklearn.model_selection import StratifiedKFold
 import time
 import numpy as np
 
+def load_all_subjects_with_labels():
+	for i in range(len(subjects)):
+		if i is 0:
+			X = np.array((subjects[i].hr, subjects[i].bvp, subjects[i].eda, subjects[i].overall_health, subjects[i].overall_stress, subjects[i].energetic, subjects[i].sleep_quality_past_month, subjects[i].sleep_quality_past_24h))
+			print("first pass : X = ", X.shape)
+			Y = np.array((subjects[i].binary_output))
+		else:
+			print("second pass : nparray = ", np.array((subjects[i].hr, subjects[i].bvp, subjects[i].eda)).shape)
+			print("second pass : X  =", X.shape)
+			X = np.concatenate((X, np.array((subjects[i].hr, subjects[i].bvp, subjects[i].eda, subjects[i].overall_health, subjects[i].overall_stress, subjects[i].energetic, subjects[i].sleep_quality_past_month, subjects[i].sleep_quality_past_24h))), axis=1)
+			print(X.shape)
+			Y = np.concatenate((Y, np.array((subjects[i].binary_output))), axis=0)
+	X = X.T
+	return X, Y
+
 def load_all_subjects():
 	for i in range(len(subjects)):
 		if i is 0:
@@ -31,23 +46,27 @@ def load_one_subject(n):
 	return X, Y
 
 
-X, Y = load_all_subjects()
-
+#X, Y = load_all_subjects()
+X, Y = load_all_subjects_with_labels()
+print(X.shape)
 #csts
 seed = 1337
 splits = 5
 startingt = time.time()
 kfold = StratifiedKFold(n_splits=splits, shuffle=True, random_state=seed)
 cvscores = []
+input("enter a  key to begin training")
 for train, test in kfold.split(X, Y):
   # create model
 	model = Sequential()
-	model.add(Dense(4, input_dim=3, activation='relu'))
-	model.add(Dense(4, activation='relu'))
-	model.add(Dense(4, activation='relu'))
+	model.add(Dense(X.shape[1], input_dim= X.shape[1], activation='relu'))
+	model.add(Dense(X.shape[1], activation='relu'))
+	model.add(Dense(X.shape[1], activation='relu'))
 	model.add(Dense(1, activation='sigmoid'))
+
 	# Compile model
 	model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+	model.summary()
 	# Fit the model
 	model.fit(X[train], Y[train], epochs=10, batch_size=256, verbose=1)
 	# Evaluate the model

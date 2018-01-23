@@ -6,7 +6,6 @@ import os
 import csv
 import numpy as np
 import matplotlib.pyplot as plt
-from labelizer import labelize
 import time
 import json
 import gc
@@ -310,6 +309,10 @@ gc.collect()
 #    s.correct_time()
 
 fix_subjects()
+import labelizer
+labelizer.labelize(subjects)
+
+
 
 
 #for s in subjects:

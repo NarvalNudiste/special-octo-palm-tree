@@ -7,12 +7,28 @@
 This school project aims to explore machine learning algorithms through the use of SVM (scikit) and deep learning (keras, tensorflow).
 Physiological data samples will be provided by the E4 *empatica* wristband.
 
+# Table of contents
+1. [Introduction](#introduction)
+2. [Tensorflow / Keras](#tensorflow)
+    1. [Hardware side](#hardware)
+3. [Requirements](#requirements)
+4. [Neural networks basics](#neural)
+5. [Keras basics](#keras)
+6. [Performances Comparison](#performances)
+7. [Data Collection / Workshop](#data-collection)
+8. [Data pre-processing](#data-pre-processing)
+9. [Individual data](#individual-data)
+10. [Input / Ouput format](#input)
+11. [Results](#results)
+12. [Conclusion](#conclusion)
+
 ### Introduction
 
 Last year ago, a SVM model has been developed to classify stress levels according to physiological data.
 The main aim of the project is to develop a model to see how well the deep learning approach can do in comparison of the svm approach.
 In addition of this, the old dataset we have to work with hasn't been properly labelized - a new data collection is thus part of the project.
 The old model will obviously use the same dataset to get relevant performance comparisons.
+
 
 ### Tensorflow / Keras
 
@@ -83,8 +99,10 @@ model = Sequential()
 Layers can then be stacked on top of each other this way :
 
 ```python
-model.add(Dense(32, input_shape=(*, 16))) # input arrays of shape (*, 16) and output arrays of shape (*, 32)
-model.add(Dense(10, activation='softmax')) # activation function can be specified there
+# input arrays of shape (*, 16) and output arrays of shape (*, 32)
+model.add(Dense(32, input_shape=(*, 16)))
+ # activation function can be specified there
+model.add(Dense(10, activation='softmax'))
 #and so on
 ```
 
@@ -100,7 +118,8 @@ A lot of optimizers are available in Keras, such as stochastic gradient descent,
 After compilation, the model can be trained & evaluated:
 
 ```python
-model.fit(data, labels, epochs=10, batch_size=32) #epochs are the number of passes
+#epochs are the number of passes
+model.fit(data, labels, epochs=10, batch_size=32)
 score = model.evaluate(x_test, y_test, batch_size=128)
 ```
 
@@ -128,7 +147,7 @@ Data was then downloaded from the Empatica cloud as .csv files :
 
 * **TEMP.csv** -  Data from temperature sensor expressed degrees on the Celsius (°C) scale.
 
-* **EDA.csv** - Data from the electrodermal activity sensor expressed as microsiemens (μS).
+* **EDA.csv** - Data from the electrodermal activity sensor expressed as microsiemens.
 
 * **BVP.csv** - Data from photoplethysmograph.
 
@@ -228,7 +247,9 @@ A *Person* class is used to store individual data according to the JSON file :
 
 ```python
 class Person:
-    def __init__(self, start, stop, overall_health, energetic, overall_stress, stressed_past_24h, sleep_quality_past_24h,  sleep_quality_past_month, id):
+    def __init__(self, start, stop, overall_health,
+    energetic, overall_stress, stressed_past_24h,
+    sleep_quality_past_24h,  sleep_quality_past_month, id):
         self.timestamps = (start, stop)
         self.overall_health = overall_health
         self.energetic = energetic
@@ -250,14 +271,29 @@ class Person:
     def pprint_eda(self):
         plt.plot(np.linspace(0, self.eda.shape[0], self.eda.shape[0]), self.eda)
         for i in range(0, len(self.tags)):
-            plt.plot([self.tags[i], self.tags[i]], [np.amin(self.eda), np.amax(self.eda)], color = 'red', linewidth = 2.5, linestyle = "--", label="EDA")
+            plt.plot([self.tags[i],
+            self.tags[i]],
+            [np.amin(self.eda),
+            np.amax(self.eda)],
+            color = 'red',
+            linewidth = 2.5,
+            linestyle = "--",
+            label="EDA")
         plt.show()
     # ...
 
 subjects = list()
 labels_data = json.load(open('data/labels.json'))
     for persons in labels_data["persons"]:
-        subjects.append(Person(persons["time_start"], persons["time_stop"], persons["overall_health"], persons["energetic"], persons["overall_stress"], persons["stressed_past_24h"], persons["sleep_quality_past_24h"], persons["sleep_quality_past_month"], persons["id"]))
+        subjects.append(Person(persons["time_start"],
+        persons["time_stop"],
+        persons["overall_health"],
+        persons["energetic"],
+        persons["overall_stress"],
+        persons["stressed_past_24h"],
+        persons["sleep_quality_past_24h"],
+        persons["sleep_quality_past_month"],
+        persons["id"]))
     # ...
 
 for s in subjects:
@@ -265,7 +301,8 @@ for s in subjects:
     s.hr = hr[s.timestamps[0]:s.timestamps[1]]
     s.temp = temp[s.timestamps[0]:s.timestamps[1]]
     s.bvp = bvp[s.timestamps[0]:s.timestamps[1]]
-    s.tags = timestamps[np.where(np.logical_and(timestamps>=s.timestamps[0],timestamps<=s.timestamps[1]))]
+    s.tags = timestamps[np.where(np.logical_and(timestamps>=s.timestamps[0],
+      timestamps<=s.timestamps[1]))]
     # ...
 
 
@@ -307,4 +344,29 @@ acc: 90.63%
 time elapsed :  357.99447441101074  s
 ```
 
-We'll see later if data personalization can help improve our result.
+We can help our classifier adding user-provided data (collected during survey):
+
+```python
+def labelize(subjects):
+    for i in range(len(subjects)):
+        for i in range(len(subjects)):
+            shape = subjects[i].bvp.shape[0]
+            subjects[i].overall_health = np.full(shape, subjects[i].overall_health)
+            subjects[i].overall_stress = np.full(shape, subjects[i].overall_stress)
+            subjects[i].energetic = np.full(shape, subjects[i].energetic)
+            subjects[i].sleep_quality_past_24h = np.full(shape, subjects[i].sleep_quality_past_24h)
+            subjects[i].sleep_quality_past_month = np.full(shape, subjects[i].sleep_quality_past_month)
+            subjects[i].stressed_past_24h = np.full(shape, subjects[i].stressed_past_24h)
+# ...
+X = np.array((subjects[i].hr,
+  subjects[i].bvp,
+  subjects[i].eda,
+  subjects[i].overall_health,
+  subjects[i].overall_stress,
+  subjects[i].energetic,
+  subjects[i].sleep_quality_past_month,
+  subjects[i].sleep_quality_past_24h))
+#   ...
+```
+
+### Conclusion
