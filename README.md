@@ -20,7 +20,10 @@ Physiological data samples will be provided by the E4 *empatica* wristband.
 9. [Individual data](#individual-data)
 10. [Input / Ouput format](#input--ouput-format)
 11. [Results](#results)
-12. [Conclusion](#conclusion)
+12. [What went wrong](#what-went-wrong)
+13. [Possible improvements](#possible-improvements)
+14. [Conclusion](#conclusion)
+
 
 ### Introduction
 
