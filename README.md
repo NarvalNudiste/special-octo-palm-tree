@@ -395,8 +395,23 @@ Output vector is a simple array of same length filled with corresponding class (
 
 First results don't include data personalization but still are pretty good :
 
-Binary classifier, statified cross-validation (80% training data, 20% data, 5 pass) :
-```
+Binary classifier, statified cross-validation (80% training data, 20% test data, 5 pass, 10 epochs) :
+```python
+________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+dense_1 (Dense)              (None, 8)                 72
+_________________________________________________________________
+dense_2 (Dense)              (None, 8)                 72
+_________________________________________________________________
+dense_3 (Dense)              (None, 8)                 72
+_________________________________________________________________
+dense_4 (Dense)              (None, 1)                 9
+=================================================================
+Total params: 225
+Trainable params: 225
+Non-trainable params: 0
+
 acc: 90.63%
 91.62% (+/- 0.83%)
 time elapsed :  357.99447441101074  s
@@ -427,8 +442,69 @@ X = np.array((subjects[i].hr,
 #   ...
 ```
 
-### Possible improvements
+With those informations, our accuray raises up a little bit more :
+
+Binary classifier, statified cross-validation (80% training data, 20% test data, 5 pass, 10 epochs) :
+```python
+________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+dense_1 (Dense)              (None, 8)                 72
+_________________________________________________________________
+dense_2 (Dense)              (None, 8)                 72
+_________________________________________________________________
+dense_3 (Dense)              (None, 8)                 72
+_________________________________________________________________
+dense_4 (Dense)              (None, 1)                 9
+=================================================================
+Total params: 225
+Trainable params: 225
+Non-trainable params: 0
+
+acc: 94.89%
+93.18% (+/- 0.92%)
+time elapsed :  353.3355987071991  s
+```
+
+As epochs are increased, computing time becomes quite long and we hit the 95%+ accuracy.
+
+Binary classifier, statified cross-validation (80% training data, 20% test data, 5 pass, 25 epochs) :
+```python
+________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+dense_1 (Dense)              (None, 8)                 72
+_________________________________________________________________
+dense_2 (Dense)              (None, 8)                 72
+_________________________________________________________________
+dense_3 (Dense)              (None, 8)                 72
+_________________________________________________________________
+dense_4 (Dense)              (None, 1)                 9
+=================================================================
+Total params: 225
+Trainable params: 225
+Non-trainable params: 0
+
+95.35% (+/- 0.79%)
+time elapsed :  823.8604867458344  s
+
+```
+
+As the relation seems to be pretty linear (Higher EDA / BVP values -> higher odds of experiencing a stressing situation), a change of model doesn't seems to have this much impact on accuracy.
 
 ### What went wrong
 
+* Some errors during data collection (lacking some wristband tags)
+* The project took a very long time to see its first "real" results due to my lack of knowledge about NNs
+* As any student wanting to see results, bias may occur
+
+### Possible improvements
+
+* Test more models with automatized tests, training time critically increasing as data size grows
+* More strict data collection
+* Less specific data collection (in order to make the classifier user friendly)
+* Ask for more parameters in survey
+
 ### Conclusion
+
+todo
