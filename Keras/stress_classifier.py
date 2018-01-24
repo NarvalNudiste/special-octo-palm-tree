@@ -55,7 +55,14 @@ splits = 5
 startingt = time.time()
 kfold = StratifiedKFold(n_splits=splits, shuffle=True, random_state=seed)
 cvscores = []
+print("X Shape :", X.shape)
 input("enter a  key to begin training")
+
+callbacks = list()
+tbCallback = TensorBoard(log_dir='logs', histogram_freq=0,
+          write_graph=True, write_images=True)
+callbacks.append(tbCallback)
+
 for train, test in kfold.split(X, Y):
   # create model
 	model = Sequential()
@@ -68,7 +75,7 @@ for train, test in kfold.split(X, Y):
 	model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 	model.summary()
 	# Fit the model
-	model.fit(X[train], Y[train], epochs=10, batch_size=256, verbose=1)
+	model.fit(X[train], Y[train], epochs=10, batch_size=256, callbacks = callbacks, verbose=1)
 	# Evaluate the model
 	scores = model.evaluate(X[test], Y[test], verbose=0)
 	print("%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))

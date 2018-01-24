@@ -323,9 +323,71 @@ def load_all_subjects():
 
 ### Individual data
 
+The red lines indicates the four data collection steps. (In order of appearance, calm music - stressing music - stressing movie excerpt - stressing game).
+
+As scales greatly differs between, it is quite difficult to tell if there is an actual, clear trend going on.
+As a rule of thumb, people indicating lesser health condition showed greater responses to stimulus : e.g Subject #5 (Overall health : 1 / Energetic : 1 / Overall stress : 1) showing up to 8 microsiemens - altought it could be due to noise - during the test.
+
+
+#### Subject #0 :
+
+![Subject #0](Keras/pics/All/0.png)
+
+#### Subject #1 :
+
+![Subject #1](Keras/pics/All/1.png)
+
+#### Subject #2 :
+
+![Subject #2](Keras/pics/All/2.png)
+
+#### Subject #3 :
+
+![Subject #3](Keras/pics/All/3.png)
+
+#### Subject #4 :
+
+![Subject #4](Keras/pics/All/4.png)
+
+#### Subject #5 :
+
+![Subject #5](Keras/pics/All/5.png)
+
+#### Subject #6 :
+
+![Subject #6](Keras/pics/All/6.png)
+
+#### Subject #7 :
+
+![Subject #7](Keras/pics/All/7.png)
+
 [Individual data](docs/INDIVIDUAL_DATA.md), separated by signal type.
 
 ### Input / Ouput format
+
+After data pre-processing, input vector is a numpy array of shape (504134, 8) and looks pretty much like this (id label ):
+
+(Index) | BVP | EDA | HR | OH_l | OS_l | E_l | other_labels | id |
+------------ |
+0 |-2.7811e+02 | 3.20251e-04 | 1.0359e+02 | 4 | 3 | 3 | ... |  0
+1 |-1761+02 | 1.60125e-04 | 1.0359e+02 | 4 | 3 | 3 | ... | 0
+2 |-9.86+01 | 0.0000e+00 | 1.0359e+02 | 4 | 3 | 3 | ... | 0
+... | ... | ... | ... | ... | ... | ... | ...| ...
+58798 | 9.620e+01 | 4.82972e-01 | 1.0315e+02 | 4 | 3 | 3 | ... |  1
+58799 | 6.490e+01 | 4.66817e-01 | 1.0314e+02 | 4 | 3 | 3 | ... | 1
+58800 | 2.619e+01 | 4.50662e-01 | 1.0313e+02 | 4 | 3 | 3 | ... | 1
+... | ... | ... | ... | ... | ... | ... | ...| ...
+
+Output vector is a simple array of same length filled with corresponding class (0 correspond to a non-stressing activity, 1 to a stressing activity):
+
+(Index) | Output
+------- | ------
+... | ...
+4652 | 0
+4653 | 0
+4654 | 1
+4655 | 1
+... | ...
 
 ![Diagram](Keras/pics/NN_diagram.png)
 
@@ -364,5 +426,9 @@ X = np.array((subjects[i].hr,
   subjects[i].sleep_quality_past_24h))
 #   ...
 ```
+
+### Possible improvements
+
+### What went wrong
 
 ### Conclusion

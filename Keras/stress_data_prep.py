@@ -71,12 +71,12 @@ class Person:
         for i in range(0, len(self.tags)):
             plt.plot([self.tags[i], self.tags[i]], [1, 1000], color = 'red', linewidth = 2.5, linestyle = "--")
         plt.show()
-    def pprint_eda(self):
+    def pprint_eda(self, min=None, max=None):
         plt.plot(np.linspace(0, self.eda.shape[0], self.eda.shape[0]), self.eda)
         plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc=3,
             ncol=1, mode="expand", borderaxespad=0.)
         for i in range(0, len(self.tags)):
-            plt.plot([self.tags[i], self.tags[i]], [np.amin(self.eda), np.amax(self.eda)], color = 'red', linewidth = 2.5, linestyle = "--", label="EDA")
+                plt.plot([self.tags[i], self.tags[i]], [np.amin(self.eda), np.amax(self.eda)], color = 'red', linewidth = 2.5, linestyle = "--", label="EDA")
         plt.show()
     def pprint_bvp(self):
         plt.plot(np.linspace(0, self.bvp.shape[0], self.bvp.shape[0]), self.bvp)
@@ -320,7 +320,8 @@ labelizer.labelize(subjects)
         #s.pprint_eda()
 '''
 for s in subjects:
-    s.pprint_hr()
+    if s.id == 1:
+        s.pprint_eda(0.0, 0.2)
 
 for s in subjects:
     s.pprint_temp()
