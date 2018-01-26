@@ -510,4 +510,12 @@ As the relation seems to be pretty linear (Higher EDA / BVP values -> higher odd
 
 ### Conclusion
 
-todo
+As a first approach to machine learning, this project was very insightful. Tasks were varied (lot of readings about neural networks, data collection, model testing, data pre-processing) and I've learned a lot.
+Working with Keras also made me curious about Tensorflow : working with pre-determined models is handy but kind of obfuscates the basic workflow of a neural network.
+
+Concerning the stress detection part, our classifier does his job pretty well ! Even with lacking informations over a person health condition, our classifier did manage to recognise a relation between physiological inputs and its equivalent activity.
+What should be kept in mind is that it is a very specific network that may very well be biased. The sole fact that subjects were aware of themselves being tested may have increase their stress level.
+If we really want to create a \emph{reliable} and \emph{capable} classifier, we should study stress from a medical point of view and ask competent people about determining factors :  A neural network isn't ensured to be able to challenge years of study on a given subject, and knowledge is very valuable when desiging models.
+
+A possible outcome could be to extend the classifier to a live version, communicating with the Empatica wristband at runtime and regularly update its weights. Data personalization could be provided by the client and the service could offer a stress condition tracking.
+In the end, I had a lot of fun working on this project and progressed a lot with python libraries. I will definitively tackle on deep learning again.
