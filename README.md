@@ -383,7 +383,7 @@ Index | BVP | EDA | HR | OH_l | OS_l | E_l | other_labels | id |
 
 Output vector is a simple array of same length filled with corresponding class (0 correspond to a non-stressing activity, 1 to a stressing activity):
 
-(Index) | Output
+Index | Output
 ------- | ------
 ... | ...
 4652 | 0

@@ -1,0 +1,309 @@
+<html>
+ <head>
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head> 
+<body>
+<h1 id="stress-detection-deep-learning-classification">Stress detection / Deep learning classification</h1>
+<h2 id="he-arc---3rd-project">he-arc - 3rd project</h2>
+<h5 id="guillaume-noguera-inf3-dlma">Guillaume Noguera, inf3-dlma</h5>
+<h3 id="stress-classification-with-various-machine-learning-libraries">Stress classification with various machine learning libraries</h3>
+<p>This school project aims to explore machine learning algorithms through the use of SVM (scikit) and deep learning (keras, tensorflow). Physiological data samples will be provided by the E4 <em>empatica</em> wristband.</p>
+<h1 id="table-of-contents">Table of contents</h1>
+<ol style="list-style-type: decimal">
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#tensorflow--keras">Tensorflow / Keras</a>
+<ol style="list-style-type: decimal">
+<li><a href="#hardware-side">Hardware side</a></li>
+</ol></li>
+<li><a href="#requirements">Requirements</a></li>
+<li><a href="#neural-networks-basics">Neural networks basics</a></li>
+<li><a href="#keras-basics">Keras basics</a></li>
+<li><a href="#performances-comparison">Performances Comparison</a></li>
+<li><a href="#data-collection">Data Collection / Workshop</a></li>
+<li><a href="#data-pre-processing">Data pre-processing</a></li>
+<li><a href="#individual-data">Individual data</a></li>
+<li><a href="#input--ouput-format">Input / Ouput format</a></li>
+<li><a href="#results">Results</a></li>
+<li><a href="#conclusion">Conclusion</a></li>
+</ol>
+<h3 id="introduction">Introduction</h3>
+<p>Last year ago, a SVM model has been developed to classify stress levels according to physiological data. The main aim of the project is to develop a model to see how well the deep learning approach can do in comparison of the svm approach. In addition of this, the old dataset we have to work with hasn't been properly labelized - a new data collection is thus part of the project. The old model will obviously use the same dataset to get relevant performance comparisons.</p>
+<h3 id="tensorflow-keras">Tensorflow / Keras</h3>
+<p>Keras now supports and uses Tensorflow (in addition of Theano) - it can be seen as an higher level library using tf - and will shortly be integrated to it. It can be used to quickly create complex models with minimal code. Tensorflow is more of a language than a framework, providing its own syntax to develop machine learning models. While Tensorflow offers a greater degree of freedom, Keras is simpler and more user oriented. Like Scikit-learn, it provides pre-defined models (allowing users to define their own). A possible approach could be to use those models before diving into Tensorflow (as time could - and <em>will</em> - be a possible limitation). Therefore, our main focus will be on Keras.</p>
+<p><a href="docs/INSTALL_GUIDE.md">Keras install guide</a></p>
+<h4 id="hardware-side">Hardware side</h4>
+<p>Tensorflow backend can run on CPU or GPU, the latter obviously offering better training performances (roughly 8-10x faster, depending on the GPU). In order to run Keras / Tensorflow with GPU support, both nVIDIA's <a href="https://developer.nvidia.com/cuda-toolkit">CUDA</a> (Compute Unified Device Architecture) Toolkit v8.0 and <a href="https://developer.nvidia.com/cudnn">cuDNN</a> v6.0 (NVIDIA's deep neural network library) need to be installed on the host system (CUDA v9.0 and cuDNN v7.0 not being supported yet as of january 2018).</p>
+<p>The whole project ran on a modest i7-5700HQ / GTX 980M.</p>
+<h3 id="requirements">Requirements</h3>
+<ol style="list-style-type: decimal">
+<li>SVM approach</li>
+</ol>
+<ul>
+<li>Familiarization with Support Vector Machines (SVM)</li>
+<li>Various tests with sci-kit's SVM classifier on provided sample data (iris, digits)</li>
+<li>First implementation with small E4 datasets</li>
+<li>Proper implementation with the actual database</li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li>Deep Learning approach</li>
+</ol>
+<ul>
+<li>Familiarization with Deep Learning key concepts</li>
+<li>Familiarization with Tensorflow and Keras libraries</li>
+<li>Keras / Tensorflow comparison</li>
+<li>Discussion of the final choice between Keras and Tensorflow</li>
+</ul>
+<ol start="3" style="list-style-type: decimal">
+<li>Getting data</li>
+</ol>
+<ul>
+<li>Stress workshop planning</li>
+<li>Actual data collection</li>
+<li>Data pre-processing</li>
+</ul>
+<ol start="4" style="list-style-type: decimal">
+<li>Keras implementation</li>
+</ol>
+<ul>
+<li>Model creation</li>
+<li>Training and adjusments</li>
+<li>(Optional) Tensorflow approach</li>
+</ul>
+<ol start="5" style="list-style-type: decimal">
+<li>Accuracy comparison</li>
+</ol>
+<ul>
+<li>Figuring a way to compare algorithms performance (False negative, false positive, etc.)</li>
+<li>Some visual representations</li>
+<li>Preparing data for visualization</li>
+<li>Coordination with the team</li>
+</ul>
+<ol start="6" style="list-style-type: decimal">
+<li>Documentation</li>
+</ol>
+<ul>
+<li>Sphinx documentation</li>
+<li>Ad-hoc LaTeX report</li>
+</ul>
+<h3 id="neural-networks-basics">Neural networks basics</h3>
+<p>At the core of every neural network is the perceptron, which dates back to the late 1950's. Invented by Frank Rosenblatt, the perceptron was largely inspired by neurobiology as it mimics neurons basic behaviour: a neuron takes an input and then choose to fire or not fire depending on input's value. The function used to determine if a neuron is activated is called the activation function : it is often a non-linear function (Sigmoid, ArcTan, ReLU), as most real-world problems are non-linear indeed.</p>
+<p>Perceptrons can produce one or several ouputs; they can can also be stacked, resulting in a multi-layer perceptron (MLP). The most basic MLP contains an input layer, an hidden layer and an output layer. As additionnals hidden layers are stacked on the top of each others, our basic MLP transitions into a deep neural network.</p>
+<h3 id="keras-basics">Keras basics</h3>
+<p>Keras provides us with easy ways to quickly build a model :</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">model <span class="op">=</span> Sequential()</code></pre></div>
+<p>Layers can then be stacked on top of each other this way :</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co"># input arrays of shape (*, 16) and output arrays of shape (*, 32)</span>
+model.add(Dense(<span class="dv">32</span>, input_shape<span class="op">=</span>(<span class="op">*</span>, <span class="dv">16</span>)))
+ <span class="co"># activation function can be specified there</span>
+model.add(Dense(<span class="dv">10</span>, activation<span class="op">=</span><span class="st">&#39;softmax&#39;</span>))
+<span class="co">#and so on</span></code></pre></div>
+<p>Next, the model needs to be compiled. The optimizer, loss function and metrics are provided there.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">model.<span class="bu">compile</span>(optimizer<span class="op">=</span><span class="st">&#39;rmsprop&#39;</span>,
+              loss<span class="op">=</span><span class="st">&#39;categorical_crossentropy&#39;</span>,
+              metrics<span class="op">=</span>[<span class="st">&#39;accuracy&#39;</span>])</code></pre></div>
+<p>A lot of optimizers are available in Keras, such as stochastic gradient descent, RMSprop (often good for recurrent neural networks), ADAM .. the whole list is available in the <a href="https://keras.io/optimizers/">keras documentation.</a></p>
+<p>After compilation, the model can be trained &amp; evaluated:</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co">#epochs are the number of passes</span>
+model.fit(data, labels, epochs<span class="op">=</span><span class="dv">10</span>, batch_size<span class="op">=</span><span class="dv">32</span>)
+score <span class="op">=</span> model.evaluate(x_test, y_test, batch_size<span class="op">=</span><span class="dv">128</span>)</code></pre></div>
+<h3 id="performances-comparison">Performances Comparison</h3>
+<p><a href="docs/PERFS.md">Here's some performances comparison</a></p>
+<p>Thoses performances comparison comes from multiple training sessions on the pima diabetes dataset. Models have been tested with different hidden layers and neurons numbers (from 1x1 to 64x64), with or without Dropout layers, and each time for 5 different optimizers. Overall, the Rectifier activation function (ReLU) seems to be the best choice for binary classification on this dataset. As this may vary on different data structure, I think repeating those tests with the proper data can help finding a suitable model.</p>
+<h3 id="data-collection-workshop">Data collection / Workshop</h3>
+<p>A data collection workshop has been run internally. Volunteers students answered a small survey (general health condition, how energetic they overall feel, stress level, etc.) and took part of the following test (wristband obviously equipped) :</p>
+<ul>
+<li>Listening to a short relaxing music</li>
+<li>Listening to a stressful music</li>
+<li>Watching a short horror trailer</li>
+<li>Playing a ZType game</li>
+</ul>
+<p>Subjects were asked if they felt a difference after each activity (more relaxed, a bit more relaxed, a bit more stressed, more stressed, neutral response). Data was then downloaded from the Empatica cloud as .csv files :</p>
+<ul>
+<li><p><strong>TEMP.csv</strong> - Data from temperature sensor expressed degrees on the Celsius (°C) scale.</p></li>
+<li><p><strong>EDA.csv</strong> - Data from the electrodermal activity sensor expressed as microsiemens.</p></li>
+<li><p><strong>BVP.csv</strong> - Data from photoplethysmograph.</p></li>
+<li><p><strong>HR.csv</strong> - Average heart rate extracted from the BVP signal.The first row is the initial time of the session expressed as unix timestamp in UTC. The second row is the sample rate expressed in Hz.</p></li>
+<li><p><strong>tags.csv</strong> - Event mark times. Each row corresponds to a physical button press on the device; the same time as the status LED is first illuminated. The time is expressed as a unix timestamp in UTC and it is synchronized with initial time of the session indicated in the related data files from the corresponding session.</p></li>
+</ul>
+<h3 id="data-pre-processing">Data pre-processing</h3>
+<p>All E4 wristband sensors deliver different data formats, as the sample rate may vary : the photoplethysmograph sensor (BVP) has a 64Hz sample rate, whereas the electrodermal activity sensor sensor (EDA) only samples at 4Hz. Thus, we need a function using linear interpolation to even out our arrays :</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> reshape_array_freq(bFreq, freq, ary):
+    <span class="cf">if</span> bFreq <span class="kw">is</span> freq:
+        <span class="cf">return</span> ary
+    <span class="cf">else</span>:
+        dF <span class="op">=</span> <span class="bu">int</span>(freq<span class="op">/</span>bFreq)
+        new <span class="op">=</span> np.empty((ary.shape[<span class="dv">0</span>]<span class="op">-</span><span class="dv">1</span>) <span class="op">*</span> <span class="bu">int</span>(dF))
+        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(ary)<span class="op">-</span><span class="dv">1</span>):
+            delta <span class="op">=</span> (ary[i<span class="op">+</span><span class="dv">1</span>] <span class="op">-</span> ary[i])<span class="op">/</span>dF
+            <span class="cf">for</span> c <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">int</span>(dF)):
+                new[(i<span class="op">*</span>dF)<span class="op">+</span>c] <span class="op">=</span> ary[i] <span class="op">+</span> delta<span class="op">*</span>c
+        <span class="cf">return</span> new</code></pre></div>
+<p>We also need to remove some data at the end of certain data arrays, as they do not have the same length after interpolation (I guess all the sensors don't necessarily stop at the exact same time)</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">
+<span class="kw">def</span> resize_ary(a1, a2):
+    diff <span class="op">=</span> <span class="bu">abs</span>(a1.shape[<span class="dv">0</span>] <span class="op">-</span> a2.shape[<span class="dv">0</span>])
+    <span class="cf">if</span> a1.shape[<span class="dv">0</span>] <span class="op">&lt;</span> a2.shape[<span class="dv">0</span>]:
+        a2 <span class="op">=</span> a2[:<span class="op">-</span>diff]
+    <span class="cf">else</span>:
+        a1 <span class="op">=</span> a1[:<span class="op">-</span>diff]
+    <span class="cf">return</span> a1, a2</code></pre></div>
+<div class="figure">
+<img src="Keras/pics/r_plot_all.png" title="Formatted data" alt="Formatted data" />
+<p class="caption">Formatted data</p>
+</div>
+<p>Our data being properly formatted, we then use JSON to store labels from the data collection survey.</p>
+<div class="sourceCode"><pre class="sourceCode json"><code class="sourceCode json"><span class="fu">{</span>
+  <span class="dt">&quot;persons&quot;</span> <span class="fu">:</span> <span class="ot">[</span>
+    <span class="fu">{</span>
+    <span class="dt">&quot;id&quot;</span> <span class="fu">:</span> <span class="dv">0</span><span class="fu">,</span>
+    <span class="dt">&quot;file&quot;</span> <span class="fu">:</span> <span class="st">&quot;a&quot;</span><span class="fu">,</span>
+    <span class="dt">&quot;time_start&quot;</span> <span class="fu">:</span> <span class="dv">25774</span><span class="fu">,</span>
+    <span class="dt">&quot;time_stop&quot;</span> <span class="fu">:</span> <span class="dv">85175</span><span class="fu">,</span>
+    <span class="dt">&quot;overall_health&quot;</span> <span class="fu">:</span> <span class="dv">2</span><span class="fu">,</span>
+    <span class="dt">&quot;energetic&quot;</span> <span class="fu">:</span> <span class="dv">2</span><span class="fu">,</span>
+    <span class="dt">&quot;overall_stress&quot;</span> <span class="fu">:</span> <span class="dv">3</span><span class="fu">,</span>
+    <span class="dt">&quot;stressed_past_24h&quot;</span> <span class="fu">:</span> <span class="dv">3</span><span class="fu">,</span>
+    <span class="dt">&quot;sleep_quality_past_24h&quot;</span> <span class="fu">:</span> <span class="dv">2</span><span class="fu">,</span>
+    <span class="dt">&quot;sleep_quality_past_month&quot;</span> <span class="fu">:</span> <span class="dv">1</span><span class="fu">,</span>
+    <span class="dt">&quot;tag_relaxed_m&quot;</span> <span class="fu">:</span> <span class="dv">29106</span><span class="fu">,</span>
+    <span class="dt">&quot;tag_stressful_m&quot;</span> <span class="fu">:</span> <span class="dv">43013</span><span class="fu">,</span>
+    <span class="dt">&quot;tag_trailer&quot;</span> <span class="fu">:</span> <span class="dv">55472</span><span class="fu">,</span>
+    <span class="dt">&quot;tag_game&quot;</span> <span class="fu">:</span> <span class="dv">74981</span><span class="fu">,</span>
+    <span class="dt">&quot;reliable&quot;</span> <span class="fu">:</span> <span class="dv">1</span>
+  <span class="fu">}</span>
+  <span class="fu">{</span>
+    <span class="dt">&quot;...&quot;</span> <span class="fu">:</span> <span class="st">&quot;...&quot;</span>
+  <span class="fu">}</span>
+<span class="ot">]</span>
+<span class="fu">}</span></code></pre></div>
+<p>Later on, those labels will hopefully help our classifier. My approach was to consider the whole data as a long multidimensional array, resampled to 64Hz. As data collection was done in parallel with two wristbands, I had a few issues putting the time tags at the right place :</p>
+<div class="figure">
+<img src="Keras/pics/oops.png" title="Oops" alt="Oops" />
+<p class="caption">Oops</p>
+</div>
+<p><em>Oops</em></p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="co"># A bit messy</span>
+<span class="kw">def</span> concatenate_time(ary_a, ary_b, timestart_a, timestart_b):
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(ary_a.shape[<span class="dv">0</span>]):
+        ary_a[i] <span class="op">=</span> ary_a[i] <span class="op">-</span> timestart_a
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(ary_b.shape[<span class="dv">0</span>]):
+        ary_b[i] <span class="op">=</span> ary_b[i] <span class="op">-</span> timestart_b
+
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(ary_b.shape[<span class="dv">0</span>]):
+        ary_b[i] <span class="op">=</span> ary_b[i]<span class="op">+</span>ary_a[<span class="op">-</span><span class="dv">1</span>]
+
+    new_ary <span class="op">=</span> np.concatenate((ary_a, ary_b), axis<span class="op">=</span><span class="dv">0</span>)
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(new_ary.shape[<span class="dv">0</span>]):
+        new_ary[i] <span class="op">=</span> new_ary[i]<span class="op">*</span>MAXFREQ
+    <span class="cf">return</span> new_ary</code></pre></div>
+<p>A <em>Person</em> class is used to store individual data according to the JSON file :</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">class</span> Person:
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, start, stop, overall_health,
+    energetic, overall_stress, stressed_past_24h,
+    sleep_quality_past_24h,  sleep_quality_past_month, <span class="bu">id</span>):
+        <span class="va">self</span>.timestamps <span class="op">=</span> (start, stop)
+        <span class="va">self</span>.overall_health <span class="op">=</span> overall_health
+        <span class="va">self</span>.energetic <span class="op">=</span> energetic
+        <span class="va">self</span>.overall_stress <span class="op">=</span> overall_stress
+        <span class="va">self</span>.stressed_past_24h <span class="op">=</span> stressed_past_24h
+        <span class="va">self</span>.sleep_quality_past_24h <span class="op">=</span> sleep_quality_past_24h
+        <span class="va">self</span>.sleep_quality_past_month <span class="op">=</span> sleep_quality_past_month
+        <span class="va">self</span>.<span class="bu">id</span> <span class="op">=</span> <span class="bu">id</span>
+        <span class="va">self</span>.eda <span class="op">=</span> <span class="va">None</span>
+        <span class="va">self</span>.hr <span class="op">=</span> <span class="va">None</span>
+        <span class="va">self</span>.temp <span class="op">=</span> <span class="va">None</span>
+        <span class="va">self</span>.bvp <span class="op">=</span> <span class="va">None</span>
+        <span class="va">self</span>.tags <span class="op">=</span> <span class="va">None</span>
+
+    <span class="kw">def</span> correct_time(<span class="va">self</span>):
+        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="bu">len</span>(<span class="va">self</span>.tags)):
+            <span class="va">self</span>.tags[i] <span class="op">=</span> <span class="va">self</span>.tags[i] <span class="op">-</span> <span class="va">self</span>.timestamps[<span class="dv">0</span>]
+
+    <span class="kw">def</span> pprint_eda(<span class="va">self</span>):
+        plt.plot(np.linspace(<span class="dv">0</span>, <span class="va">self</span>.eda.shape[<span class="dv">0</span>], <span class="va">self</span>.eda.shape[<span class="dv">0</span>]), <span class="va">self</span>.eda)
+        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">0</span>, <span class="bu">len</span>(<span class="va">self</span>.tags)):
+            plt.plot([<span class="va">self</span>.tags[i],
+            <span class="va">self</span>.tags[i]],
+            [np.amin(<span class="va">self</span>.eda),
+            np.amax(<span class="va">self</span>.eda)],
+            color <span class="op">=</span> <span class="st">&#39;red&#39;</span>,
+            linewidth <span class="op">=</span> <span class="fl">2.5</span>,
+            linestyle <span class="op">=</span> <span class="st">&quot;--&quot;</span>,
+            label<span class="op">=</span><span class="st">&quot;EDA&quot;</span>)
+        plt.show()
+    <span class="co"># ...</span>
+
+subjects <span class="op">=</span> <span class="bu">list</span>()
+labels_data <span class="op">=</span> json.load(<span class="bu">open</span>(<span class="st">&#39;data/labels.json&#39;</span>))
+    <span class="cf">for</span> persons <span class="kw">in</span> labels_data[<span class="st">&quot;persons&quot;</span>]:
+        subjects.append(Person(persons[<span class="st">&quot;time_start&quot;</span>],
+        persons[<span class="st">&quot;time_stop&quot;</span>],
+        persons[<span class="st">&quot;overall_health&quot;</span>],
+        persons[<span class="st">&quot;energetic&quot;</span>],
+        persons[<span class="st">&quot;overall_stress&quot;</span>],
+        persons[<span class="st">&quot;stressed_past_24h&quot;</span>],
+        persons[<span class="st">&quot;sleep_quality_past_24h&quot;</span>],
+        persons[<span class="st">&quot;sleep_quality_past_month&quot;</span>],
+        persons[<span class="st">&quot;id&quot;</span>]))
+    <span class="co"># ...</span>
+
+<span class="cf">for</span> s <span class="kw">in</span> subjects:
+    s.eda <span class="op">=</span> eda[s.timestamps[<span class="dv">0</span>]:s.timestamps[<span class="dv">1</span>]]
+    s.hr <span class="op">=</span> hr[s.timestamps[<span class="dv">0</span>]:s.timestamps[<span class="dv">1</span>]]
+    s.temp <span class="op">=</span> temp[s.timestamps[<span class="dv">0</span>]:s.timestamps[<span class="dv">1</span>]]
+    s.bvp <span class="op">=</span> bvp[s.timestamps[<span class="dv">0</span>]:s.timestamps[<span class="dv">1</span>]]
+    s.tags <span class="op">=</span> timestamps[np.where(np.logical_and(timestamps<span class="op">&gt;=</span>s.timestamps[<span class="dv">0</span>],
+      timestamps<span class="op">&lt;=</span>s.timestamps[<span class="dv">1</span>]))]
+    <span class="co"># ...</span>
+
+
+<span class="co">&#39;&#39;&#39; final data concatenation &#39;&#39;&#39;</span>
+
+<span class="kw">def</span> load_all_subjects():
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(subjects)):
+        <span class="cf">if</span> i <span class="kw">is</span> <span class="dv">0</span>:
+            X <span class="op">=</span> np.array((subjects[i].hr, subjects[i].bvp, subjects[i].eda))
+            Y <span class="op">=</span> np.array((subjects[i].binary_output))
+        <span class="cf">else</span>:
+            X <span class="op">=</span> np.concatenate((X, np.array((subjects[i].hr, subjects[i].bvp, subjects[i].eda))), axis<span class="op">=</span><span class="dv">1</span>)
+            Y <span class="op">=</span> np.concatenate((Y, np.array((subjects[i].binary_output))), axis<span class="op">=</span><span class="dv">0</span>)
+    X <span class="op">=</span> X.T
+    <span class="cf">return</span> X, Y</code></pre></div>
+<h3 id="individual-data">Individual data</h3>
+<p><a href="docs/INDIVIDUAL_DATA.md">Individual data</a>, separated by signal type.</p>
+<h3 id="input-ouput-format">Input / Ouput format</h3>
+<div class="figure">
+<img src="Keras/pics/NN_diagram.png" alt="Diagram" />
+<p class="caption">Diagram</p>
+</div>
+<h3 id="results">Results</h3>
+<p>First results don't include data personalization but still are pretty good :</p>
+<p>Binary classifier, statified cross-validation (80% training data, 20% data, 5 pass) :</p>
+<pre><code>acc: 90.63%
+91.62% (+/- 0.83%)
+time elapsed :  357.99447441101074  s</code></pre>
+<p>We can help our classifier adding user-provided data (collected during survey):</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> labelize(subjects):
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(subjects)):
+        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(subjects)):
+            shape <span class="op">=</span> subjects[i].bvp.shape[<span class="dv">0</span>]
+            subjects[i].overall_health <span class="op">=</span> np.full(shape, subjects[i].overall_health)
+            subjects[i].overall_stress <span class="op">=</span> np.full(shape, subjects[i].overall_stress)
+            subjects[i].energetic <span class="op">=</span> np.full(shape, subjects[i].energetic)
+            subjects[i].sleep_quality_past_24h <span class="op">=</span> np.full(shape, subjects[i].sleep_quality_past_24h)
+            subjects[i].sleep_quality_past_month <span class="op">=</span> np.full(shape, subjects[i].sleep_quality_past_month)
+            subjects[i].stressed_past_24h <span class="op">=</span> np.full(shape, subjects[i].stressed_past_24h)
+<span class="co"># ...</span>
+X <span class="op">=</span> np.array((subjects[i].hr,
+  subjects[i].bvp,
+  subjects[i].eda,
+  subjects[i].overall_health,
+  subjects[i].overall_stress,
+  subjects[i].energetic,
+  subjects[i].sleep_quality_past_month,
+  subjects[i].sleep_quality_past_24h))
+<span class="co">#   ...</span></code></pre></div>
+<h3 id="conclusion">Conclusion</h3>
+
+</body>
+</html>

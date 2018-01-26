@@ -1,0 +1,8 @@
+@font-face {
+    font-family: DinProBlack;
+    src: url(fonts/DINPro-Black.otf);
+}
+
+body{
+	font-family: DinProBlack;
+}
